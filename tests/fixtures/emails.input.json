@@ -1,0 +1,74 @@
+{
+ "threads": [
+  {
+   "threadId": "fx001",
+   "subject": "Thank you for applying to Fabrikam Goods",
+   "sender": "no-reply@greenhouse-mail.example.io",
+   "receivedIso": "2026-10-01T09:12:00-07:00",
+   "body": "Hi Jordan, Thank you for your interest in Fabrikam Goods! We have received your application for Senior Product Manager, Checkout Experience (Job ID: R-10442). Our team will review your background and reach out if there is a match. Best, Fabrikam Talent Acquisition"
+  },
+  {
+   "threadId": "fx002",
+   "subject": "Your application to Tailspin Software",
+   "sender": "careers@tailspin.example.com",
+   "receivedIso": "2026-10-02T15:40:00-07:00",
+   "body": "Dear Jordan, Thank you for applying for the Director of Product, Enterprise Billing Platform role. After careful review, we have decided to move forward with other candidates whose experience more closely matches our needs. We wish you the best in your search."
+  },
+  {
+   "threadId": "fx003",
+   "subject": "Quick chat about a PM role at Woodgrove?",
+   "sender": "Priya N. <priya.n@woodgrove.example.com>",
+   "receivedIso": "2026-10-03T11:05:00-07:00",
+   "body": "Hi Jordan - I'm a recruiter at Woodgrove Media. Your subscription growth background caught my eye for our Product Manager, Subscription Growth opening. Would you have 20 minutes this week for an intro call? Here's my calendar link."
+  },
+  {
+   "threadId": "fx004",
+   "subject": "Interview confirmation: Fabrikam Goods - Hiring Manager Interview",
+   "sender": "scheduling@fabrikam.example.com",
+   "receivedIso": "2026-10-06T08:30:00-07:00",
+   "body": "Hi Jordan, Your interview for Senior Product Manager, Checkout Experience (R-10442) is confirmed for Thursday, October 9 at 10:00 AM PT with Alex Rivera, Director of Product. Video link: (meeting link). Please reply if you need to reschedule."
+  },
+  {
+   "threadId": "fx005",
+   "subject": "How was your candidate experience?",
+   "sender": "survey@candidate-feedback.example.com",
+   "receivedIso": "2026-10-07T10:00:00-07:00",
+   "body": "Tell us about your recent experience applying to Tailspin Software. This 2-minute survey helps us improve. Click here to begin."
+  },
+  {
+   "threadId": "fx006",
+   "subject": "Your weekly grocery order has shipped",
+   "sender": "orders@shop.example.com",
+   "receivedIso": "2026-10-07T18:22:00-07:00",
+   "body": "Your order #88412 has shipped and will arrive Saturday. Track your package here."
+  },
+  {
+   "threadId": "fx007",
+   "subject": "Offer letter - Woodgrove Media",
+   "sender": "Priya N. <priya.n@woodgrove.example.com>",
+   "receivedIso": "2026-10-12T16:45:00-07:00",
+   "body": "Jordan, we are thrilled to extend you an offer for the Product Manager, Subscription Growth position. Please find your offer letter attached, including base salary, bonus, and equity details. Let us know your decision by October 19."
+  },
+  {
+   "threadId": "fx008",
+   "subject": "Update on your Fabrikam Goods interview",
+   "sender": "Alex Rivera <alex.r@fabrikam.example.com>",
+   "receivedIso": "2026-10-13T09:15:00-07:00",
+   "body": "Hi Jordan, thank you for taking the time to interview with us for the Senior Product Manager role. The team enjoyed meeting you; however, we have decided not to move forward to the next round. We appreciate your interest in Fabrikam."
+  },
+  {
+   "threadId": "fx009",
+   "subject": "Application received: Senior Product Manager, Payments (JR-5521)",
+   "sender": "talent@myworkdayjobs.example.com",
+   "receivedIso": "2026-10-13T12:00:00-07:00",
+   "body": "Adatum Travel has received your application for Senior Product Manager, Payments. Requisition: JR-5521. You can check your application status in the candidate portal."
+  },
+  {
+   "threadId": "fx010",
+   "subject": "Re: Offer letter - Woodgrove Media",
+   "sender": "Priya N. <priya.n@woodgrove.example.com>",
+   "receivedIso": "2026-10-14T09:30:00-07:00",
+   "body": "Wonderful news, Jordan - we've received your signed offer letter and are excited to welcome you on November 3. Onboarding details to follow."
+  }
+ ]
+}
