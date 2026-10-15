@@ -26,7 +26,7 @@ Read `<workspace>/career-kit.config.json` (workspace default `~/Documents/Claude
 7. **Ask** only about missing-information gaps, 2-4 per round with a "not really / skip" option. Check Experience-Context first.
 8. **New facts** the user confirms: do not write them into Experience-Context unprompted. Show the proposed addition and where it goes; write only on approval (see the experience-context-builder rules). Never write posting assessments, outcomes, or status there.
 9. **Draft the tailored resume** with the `docx` skill, from the chosen base's structure and style. Apply `preferences.resume_rules`. Real titles stay real. Lead the headline/summary with the posting's vocabulary and the strongest 1-2 qualifications. No literal years-of-experience number in the summary. Story-based bullets come from the full archive narrative. ATS-safe: no tables, columns, text boxes, or header/footer-only contact info. Render to an image and look at it.
-9a. **AI-language check** on every new or edited line (Humanizer skill if installed; else `references/rationale.md` § language checklist).
+9a. **AI-language check** on every new or edited line (invoke `humanizer:humanizer` if available; else `references/rationale.md` § language checklist).
 9b. **Narrative pass**: rising trajectory, builder identity where real, executive-communication proof, outcome-first bullets.
 10. **Re-score** with the identical rubric (same rows, weights, hard-filter flags). Before/after table, remaining framing vs genuine loss, restate hard-filter risk.
 11. **Deliver**: save as `<Name>-Resume-<Company>-<Role>.docx` in the resumes folder; summarize score change, hard-filter risk, top 1-2 things to watch.

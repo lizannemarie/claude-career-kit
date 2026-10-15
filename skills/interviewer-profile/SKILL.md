@@ -30,7 +30,7 @@ Small inputs: read them inline. Drafting always happens here, not in the subagen
 - Work style and values only. Never infer protected attributes, health, family, or personality types.
 - Match prep to the round format the user describes.
 - Never invent stories, numbers, or outcomes.
-- Run the prose through Humanizer if installed (else: no em dashes, no not-X-but-Y contrasts, no forced triads, no bold labels inside sentences).
+- Run the prose through `humanizer:humanizer` if available (else: no em dashes, no not-X-but-Y contrasts, no forced triads, no bold labels inside sentences).
 - Logistics, schedules, outcomes, and feedback go in `Interview-Log.md` (and Airtable `fact_interview` if enabled), never in Experience-Context.
 
 ## After building

@@ -13,7 +13,7 @@ Progress lives in `<workspace>/career-kit.config.json` → `setup_progress`. On 
 If `<workspace>/career-kit.config.json` doesn't exist yet, Phase 1 creates it from `templates/career-kit.config.template.json`. Never write the config anywhere inside the plugin folder.
 
 ## Phases
-1. **Preflight**: `references/preflight.md`. Detect connectors and Humanizer, report what's missing and how to add it, ask for the workspace folder (default `~/Documents/ClaudeCareer`), create it and `.career-kit/`, write the config, ask for timezone and Gmail address.
+1. **Preflight**: `references/preflight.md`. Detect connectors, install the Humanizer dependency from GitHub if missing, report what's missing and how to add it, ask for the workspace folder (default `~/Documents/ClaudeCareer`), create it and `.career-kit/`, write the config, ask for timezone and Gmail address.
 2. **Discovery interview**: run the `career-focus-interview` skill. Output `Career-Aspirations.md` + `search.*` in config.
 3. **Experience-Context interview**: run the `experience-context-builder` skill. Output `Experience-Context.md`, `Experience-Context-Archive.md`, `preferences.*`. Offer `story-bank` afterwards (optional).
 4. **Resumes**: `references/resumes.md`. Role-type base resumes, ATS-safe.

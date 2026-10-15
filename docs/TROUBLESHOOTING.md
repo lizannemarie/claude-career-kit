@@ -13,6 +13,8 @@
 | Indeed links look like `to.indeed.com/...` | Link resolution needs the browser | Install Claude in Chrome. The task resolves links to `indeed.com/viewjob?jk=...`. |
 | A posting page is blank | It's rendered client-side | Scouts fall back to ld+json, ATS JSON feeds, then the browser. Add the company's feed to `company-notes.md`. |
 | Same posting shows up again | Its URL changed (tracking params) | The check also matches company + title. Add the canonical URL to `screened-postings.md`. |
-| Cover letters or resumes sound generic | Humanizer isn't installed | Install it (see README). The skills otherwise use a built-in checklist. |
+| Cover letters or resumes sound generic | Humanizer isn't installed or hasn't loaded yet | Run `/career-setup` (preflight installs it from github.com/blader/humanizer), then start a new session. Until then the skills use a built-in checklist. |
+| Install refused: cross-marketplace dependency | The Humanizer marketplace isn't added yet | Run `/plugin marketplace add blader/humanizer`, then install career-kit again. |
+| Two Humanizer skills, or the wrong version runs | A second copy is installed (for example one uploaded to claude.ai, shown as `humanizer@synced`) | Keep the GitHub copy `humanizer@humanizer` and uninstall the other. |
 | `render-task.py` reports EMPTY or UNKNOWN | A config value is missing | Fill the key it names in `career-kit.config.json`, or run the matching Setup phase. |
 | `check-privacy.sh` warns that the denylist is missing | No `.privacy-denylist` file at the repo root | Create it with your name, employers and email, one per line. It's gitignored. |

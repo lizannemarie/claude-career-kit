@@ -45,7 +45,8 @@
       "ziprecruiter": null,
       "snagajob": null,
       "rankedin": null
-    }
+    },
+    "$humanizer_comment": "Third-party dependency from https://github.com/blader/humanizer (MIT), installed as humanizer@humanizer. true = its skill humanizer:humanizer is available; 'pending-restart' = installed, loads next session."
   },
   "search": {
     "role_targets": [],

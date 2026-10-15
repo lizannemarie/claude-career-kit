@@ -23,6 +23,8 @@ Tailoring a resume per role/per "hat" the person has genuinely held is correct t
 
 When helping someone figure out where their applications are actually getting stuck, help them tell these two gates apart rather than assuming a low contact rate is about resume framing quality or about how many different roles they've tailored toward.
 
-## Language checklist (fallback when the Humanizer skill is not installed)
+## Language checklist (fallback when the Humanizer skill, `humanizer:humanizer`, is not available)
+
+This is career-kit's own short checklist, not a copy of Humanizer.
 
 Scan every new or edited line for: em-dash overuse and repeated punctuation tics; reflexive buzzwords ("results-driven", "proven track record", "spearheaded", "leverage synergies"); hollow enthusiasm that asserts instead of demonstrating; uniform sentence rhythm; adjective piles in place of one concrete detail; not-X-but-Y contrasts; forced groups of three. Rewrite flagged lines as plain, specific statements grounded in a number, a named tool, or a named outcome. Keep lines the person already wrote well in their own voice.

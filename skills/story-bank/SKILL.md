@@ -21,4 +21,4 @@ Given a posting, interviewer profile, or question list: build a table of questio
 
 ## Rules
 - The bank holds career stories only: no interview outcomes, schedules, feedback, or company-specific assessments (those go in `Interview-Log.md` and Airtable).
-- Humanizer pass on prose if installed. First person, plain, specific.
+- `humanizer:humanizer` pass on prose if available. First person, plain, specific.

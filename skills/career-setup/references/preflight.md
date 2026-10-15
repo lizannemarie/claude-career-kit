@@ -12,9 +12,23 @@ Check your available and deferred tool names. ToolSearch can confirm a deferred 
 | Web fetch / search | `WebFetch`, `WebSearch` | job-board check, posting fetch | Usually built in; check your permission settings. |
 | Claude in Chrome | `claude-in-chrome` tools | resolving Indeed links, JS-rendered postings | Optional: install the Claude in Chrome extension. |
 | Job boards | `search_jobs` from Indeed, Dice, ZipRecruiter, Snagajob, RankedIn connectors | job-board check source A | Optional: add any of them in Settings → Connectors. Without them, source A uses the web. |
-| Humanizer skill | a skill named `humanizer` | cover letters, resume language pass | Run `/plugin marketplace add blader/humanizer`, then `/plugin install humanizer@humanizer`. Optional but recommended; skills fall back to a built-in checklist. |
+| Humanizer skill | a skill named `humanizer:humanizer` | cover letters, resume language pass, interview prose | Installed automatically as a dependency of career-kit. If missing, see "Humanizer" below. |
 
 Print a table with: found / missing / what it affects / how to add it.
+
+## Humanizer (third-party dependency)
+Humanizer is by blader (MIT), https://github.com/blader/humanizer. career-kit declares it as a plugin dependency, `humanizer@humanizer`, so installing career-kit normally installs it too. It is never copied into this repo. If `humanizer:humanizer` is not available:
+1. Check what is installed: `claude plugin list --json` (when the `claude` CLI is on PATH). Look for an entry `humanizer@humanizer`.
+2. If it is missing, ask: "career-kit uses the Humanizer plugin from github.com/blader/humanizer (MIT) for its writing pass. Install it now?" On yes, run:
+   ```bash
+   claude plugin marketplace add blader/humanizer
+   claude plugin install humanizer@humanizer
+   ```
+   Without the CLI (for example in Cowork), tell the user to run `/plugin marketplace add blader/humanizer` and then `/plugin install humanizer@humanizer`.
+3. A newly installed plugin loads in the next session. Set `connectors.humanizer` to `"pending-restart"` and tell the user to start a new session before writing letters; the smoke test re-checks it. Declined: set `false`. The skills then use their built-in checklists.
+4. If another copy is installed under a different id (for example one uploaded to claude.ai, shown as `humanizer@synced`), both register the same skill name. Tell the user, and suggest keeping only the GitHub copy so updates come from the source (`claude plugin uninstall humanizer@synced` or remove it in claude.ai).
+5. Updates: third-party marketplaces don't auto-update by default. `claude plugin update humanizer@humanizer` pulls the latest release.
+
 
 ## Workspace
 1. Ask: "Where should your career files live?" Default `~/Documents/ClaudeCareer`. If the folder exists and has files, list the career-kit files already there (Experience-Context.md, logs) and say they will be reused, not overwritten.

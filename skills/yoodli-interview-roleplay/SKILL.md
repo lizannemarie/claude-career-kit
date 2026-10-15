@@ -26,7 +26,7 @@ Keep each block short enough for a single form field.
 
 ## Rules
 - Facts about people come only from material the user supplied. Never invent.
-- Humanizer pass on all prose if installed (else: no em dashes, no not-X-but-Y, no forced triads, no bold labels inside sentences).
+- `humanizer:humanizer` pass on all prose if available (else: no em dashes, no not-X-but-Y, no forced triads, no bold labels inside sentences).
 - Persona text goes to Yoodli, not Experience-Context. Schedules and outcomes go in `Interview-Log.md`.
 - Deliver as copy/paste blocks in the reply and, if wanted, as `<workspace>/interview-prep/yoodli-<round>-personas.md`.
 - Offer to adjust demeanor or rubric weights afterwards.

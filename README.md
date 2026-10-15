@@ -14,19 +14,17 @@ Your personal files stay on your computer. See [docs/PRIVACY.md](docs/PRIVACY.md
 - An **Airtable** account, with the Airtable connector added in Claude → Settings → Connectors.
 - **Gmail**, with the Gmail connector added.
 - Optional job-board connectors: Indeed, Dice, ZipRecruiter, Snagajob, RankedIn. Without them the check uses web search and company career pages.
-- Optional but recommended: the **Humanizer** skill (a third-party skill, not bundled):
-  ```
-  /plugin marketplace add blader/humanizer
-  /plugin install humanizer@humanizer
-  ```
+- **Humanizer**, a third-party plugin by blader ([github.com/blader/humanizer](https://github.com/blader/humanizer), MIT). career-kit declares it as a dependency, so it installs automatically from GitHub with career-kit. It is not bundled in this repo.
 - Optional: the Claude in Chrome extension, for JavaScript-heavy job sites and Indeed link resolution.
 
 ## 5-minute quickstart
-1. Install the plugin:
+1. Add both marketplaces, then install career-kit. Humanizer installs with it as a dependency:
    ```
+   /plugin marketplace add blader/humanizer
    /plugin marketplace add lizannemarie/claude-career-kit
    /plugin install career-kit@claude-career-kit
    ```
+   If Humanizer is still missing, `/career-setup` offers to install it. Start a new session after installing so both plugins load.
 2. Run `/career-setup`. Setup checks your connectors and asks where your career folder should live (default `~/Documents/ClaudeCareer`). Then it walks you through the following, saving progress after each step so you can stop and resume any time:
    - a career-focus interview (what you want)
    - an experience interview (what you've done)
@@ -73,6 +71,9 @@ The scheduled tasks use your Claude plan's usage every day. The job-board check 
 - [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md): common problems and fixes
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): what runs inline vs in subagents, and why
 - [airtable/README.md](airtable/README.md): the tracker base and dashboard
+
+## Credits and third-party components
+- **Humanizer** by blader, MIT License: https://github.com/blader/humanizer. Used as a plugin dependency for the writing pass in cover letters, resumes and interview prep. It is not copied or modified here; updates come from its repository (`claude plugin update humanizer@humanizer`).
 
 ## Contributing
 Run the checks before opening a pull request:
