@@ -1,0 +1,263 @@
+{
+ "$comment": "Synthetic feed responses for scripts/fetch-feeds.py --offline, keyed by the full URL the script requests. Fictional companies. Regenerate nothing: edit by hand and update 'expected'.",
+ "responses": {
+  "https://boards-api.greenhouse.io/v1/boards/fabrikamgoods/jobs?content=true&pay_transparency=true": {
+   "jobs": [
+    {
+     "id": 4100001,
+     "title": "Senior Product Manager, Payments",
+     "absolute_url": "https://boards.greenhouse.io/fabrikamgoods/jobs/4100001",
+     "location": {
+      "name": "Remote - US"
+     },
+     "offices": [],
+     "departments": [
+      {
+       "name": "Product"
+      }
+     ],
+     "first_published": "2026-10-12T14:00:00-04:00",
+     "updated_at": "2026-10-13T09:00:00-04:00",
+     "pay_input_ranges": [
+      {
+       "min_cents": 16500000,
+       "max_cents": 19500000,
+       "currency_type": "USD",
+       "title": "US base"
+      }
+     ],
+     "content": "&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Fabrikam Goods is hiring a Senior Product Manager for checkout payments.&lt;/p&gt;&lt;h3&gt;What you&#x27;ll do&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;Own outcome 1 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 2 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 3 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 4 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 5 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 6 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 7 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 8 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 9 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 10 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 11 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 12 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 13 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 14 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;li&gt;Own outcome 15 for the payments roadmap: discovery, sizing, prioritization and launch with engineering and design partners.&lt;/li&gt;&lt;/ul&gt;&lt;h3&gt;Qualifications&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;5+ years of product management&lt;/li&gt;&lt;/ul&gt;"
+    },
+    {
+     "id": 4100002,
+     "title": "Product Manager, Checkout",
+     "absolute_url": "https://boards.greenhouse.io/fabrikamgoods/jobs/4100002",
+     "location": {
+      "name": "Springfield (Hybrid)"
+     },
+     "departments": [
+      {
+       "name": "Product"
+      }
+     ],
+     "first_published": "2026-10-11T10:00:00-04:00",
+     "content": "&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Checkout PM. Dedup by company+title: already screened under an older URL.&lt;/p&gt;"
+    },
+    {
+     "id": 4100003,
+     "title": "Software Engineer II",
+     "absolute_url": "https://boards.greenhouse.io/fabrikamgoods/jobs/4100003",
+     "location": {
+      "name": "Remote - US"
+     },
+     "departments": [
+      {
+       "name": "Engineering"
+      }
+     ],
+     "first_published": "2026-10-12T10:00:00-04:00",
+     "content": "&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Title filter drops this.&lt;/p&gt;"
+    },
+    {
+     "id": 4100004,
+     "title": "Product Manager Intern",
+     "absolute_url": "https://boards.greenhouse.io/fabrikamgoods/jobs/4100004",
+     "location": {
+      "name": "Remote - US"
+     },
+     "departments": [
+      {
+       "name": "University"
+      }
+     ],
+     "first_published": "2026-10-12T10:00:00-04:00",
+     "content": "&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Excluded category: Intern.&lt;/p&gt;"
+    },
+    {
+     "id": 4100005,
+     "title": "Product Manager, Growth",
+     "absolute_url": "https://boards.greenhouse.io/fabrikamgoods/jobs/4100005",
+     "location": {
+      "name": "London, UK"
+     },
+     "departments": [
+      {
+       "name": "Product"
+      }
+     ],
+     "first_published": "2026-10-12T10:00:00-04:00",
+     "content": "&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Location filter drops this.&lt;/p&gt;"
+    },
+    {
+     "id": 4100006,
+     "title": "Technical Program Manager",
+     "absolute_url": "https://boards.greenhouse.io/fabrikamgoods/jobs/4100006",
+     "location": {
+      "name": "Remote - US"
+     },
+     "departments": [
+      {
+       "name": "Program"
+      }
+     ],
+     "first_published": "2026-09-20T10:00:00-04:00",
+     "content": "&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;Date filter drops this: published before the cutoff.&lt;/p&gt;"
+    }
+   ]
+  },
+  "https://api.lever.co/v0/postings/tailspintoys?mode=json": [
+   {
+    "id": "5c1d0e2f-1111-4b6a-8c20-bbbbbbbb0001",
+    "text": "Technical Program Manager, Platform",
+    "hostedUrl": "https://jobs.lever.co/tailspintoys/5c1d0e2f-1111-4b6a-8c20-bbbbbbbb0001",
+    "categories": {
+     "location": "Chatham",
+     "team": "Platform",
+     "department": "Engineering Programs",
+     "commitment": "Full-time",
+     "allLocations": [
+      "Chatham"
+     ]
+    },
+    "workplaceType": "hybrid",
+    "country": "US",
+    "createdAt": 1791903600000,
+    "salaryRange": {
+     "min": 150000,
+     "max": 175000,
+     "currency": "USD",
+     "interval": "per-year-salary"
+    },
+    "descriptionPlain": "Tailspin Toys is looking for a Technical Program Manager to run platform launches across three engineering teams.",
+    "lists": [
+     {
+      "text": "What you'll do",
+      "content": "<li>Run quarterly planning</li><li>Own cross-team launch plans</li>"
+     }
+    ]
+   },
+   {
+    "id": "5c1d0e2f-2222-4b6a-8c20-bbbbbbbb0002",
+    "text": "Product Manager, Toys Marketplace",
+    "hostedUrl": "https://jobs.lever.co/tailspintoys/5c1d0e2f-2222-4b6a-8c20-bbbbbbbb0002",
+    "categories": {
+     "location": "Remote",
+     "team": "Marketplace",
+     "allLocations": [
+      "Remote"
+     ]
+    },
+    "workplaceType": "remote",
+    "country": "CA",
+    "createdAt": 1791817200000,
+    "descriptionPlain": "Remote in Canada only: location filter drops this.",
+    "lists": []
+   },
+   {
+    "id": "5c1d0e2f-3333-4b6a-8c20-bbbbbbbb0003",
+    "text": "Senior Product Manager",
+    "hostedUrl": "https://jobs.lever.co/tailspintoys/5c1d0e2f-3333-4b6a-8c20-bbbbbbbb0003",
+    "categories": {
+     "location": "Remote - US",
+     "team": "Product"
+    },
+    "workplaceType": "remote",
+    "country": "US",
+    "createdAt": 1791817200000,
+    "descriptionPlain": "Dedup by URL: already in screened-postings.",
+    "lists": []
+   }
+  ],
+  "https://api.ashbyhq.com/posting-api/job-board/woodgrove?includeCompensation=true": {
+   "apiVersion": "1",
+   "jobs": [
+    {
+     "id": "0b7e2c1a-1111-4c5e-9a10-aaaaaaaa0003",
+     "title": "Product Manager, Mobile Banking",
+     "department": "Product",
+     "team": "Digital",
+     "location": "Remote (United States)",
+     "secondaryLocations": [],
+     "isRemote": true,
+     "isListed": true,
+     "workplaceType": "Remote",
+     "publishedAt": "2026-10-14T13:00:00.000+00:00",
+     "jobUrl": "https://jobs.ashbyhq.com/woodgrove/0b7e2c1a-1111-4c5e-9a10-aaaaaaaa0003",
+     "address": {
+      "postalAddress": {
+       "addressCountry": "United States"
+      }
+     },
+     "compensation": {
+      "compensationTierSummary": "$140K - $170K • Offers Equity",
+      "scrapeableCompensationSalarySummary": "$140K - $170K"
+     },
+     "descriptionPlain": "Woodgrove Bank is hiring a Product Manager for the mobile banking app. You will own onboarding and card controls."
+    },
+    {
+     "id": "8a1f0c3d-4444-4d7e-9b30-cccccccc0002",
+     "title": "Product Manager, Lending",
+     "department": "Product",
+     "location": "Remote",
+     "isRemote": true,
+     "isListed": true,
+     "publishedAt": "2026-10-13T13:00:00.000+00:00",
+     "jobUrl": "https://jobs.ashbyhq.com/woodgrove/8a1f0c3d-4444-4d7e-9b30-cccccccc0002",
+     "descriptionPlain": "Dedup by job id: the id is in job-search-log."
+    },
+    {
+     "id": "8a1f0c3d-5555-4d7e-9b30-cccccccc0005",
+     "title": "Product Manager, Sales Enablement",
+     "department": "Sales",
+     "location": "Remote",
+     "isRemote": true,
+     "isListed": true,
+     "publishedAt": "2026-10-13T13:00:00.000+00:00",
+     "jobUrl": "https://jobs.ashbyhq.com/woodgrove/8a1f0c3d-5555-4d7e-9b30-cccccccc0005",
+     "descriptionPlain": "Excluded category: Sales."
+    },
+    {
+     "id": "8a1f0c3d-6666-4d7e-9b30-cccccccc0006",
+     "title": "Product Manager, Fraud",
+     "department": "Product",
+     "location": "New York, NY",
+     "isRemote": false,
+     "isListed": true,
+     "publishedAt": "2026-10-13T13:00:00.000+00:00",
+     "jobUrl": "https://jobs.ashbyhq.com/woodgrove/8a1f0c3d-6666-4d7e-9b30-cccccccc0006",
+     "descriptionPlain": "Onsite outside the home metro: location filter drops this."
+    },
+    {
+     "id": "8a1f0c3d-7777-4d7e-9b30-cccccccc0007",
+     "title": "Product Manager, Unlisted",
+     "location": "Remote",
+     "isRemote": true,
+     "isListed": false,
+     "publishedAt": "2026-10-13T13:00:00.000+00:00",
+     "jobUrl": "https://jobs.ashbyhq.com/woodgrove/8a1f0c3d-7777",
+     "descriptionPlain": "Unlisted: the adapter skips it, so it is never counted."
+    }
+   ]
+  }
+ },
+ "expected": {
+  "cutoff": "2026-10-10",
+  "candidates": [
+   "4100001",
+   "5c1d0e2f-1111-4b6a-8c20-bbbbbbbb0001",
+   "0b7e2c1a-1111-4c5e-9a10-aaaaaaaa0003"
+  ],
+  "counts": {
+   "fetched": 13,
+   "title": 1,
+   "excluded": 2,
+   "location": 3,
+   "date": 1,
+   "dedup": 3,
+   "candidates": 3
+  },
+  "noFeed": [
+   "Litware"
+  ]
+ }
+}

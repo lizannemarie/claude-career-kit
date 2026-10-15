@@ -1,0 +1,18 @@
+{
+  "$comment": "Synthetic config for scripts/fetch-feeds.py --offline. Fictional criteria; only the keys the script reads.",
+  "paths": {
+    "company_notes": "company-notes.md",
+    "job_search_log": "job-search-log.md",
+    "screened_postings": "screened-postings.md",
+    "job_search_runs": "job-search-runs.md"
+  },
+  "search": {
+    "role_targets": ["Product Manager", "Technical Program Manager"],
+    "home_metro": "Springfield",
+    "metro_aliases": ["Chatham", "Springfield Metro"],
+    "remote_ok": true,
+    "remote_country": "US",
+    "excluded_categories": ["Intern", "Sales"],
+    "cutoff_days_default": 3
+  }
+}
