@@ -1,0 +1,796 @@
+{
+  "$comment": "Job Application Tracker - exact clone of the author's live base, validated by building it in a scratch base through the Airtable MCP (2026-10-15). Setup reads this file and builds it with create_base -> create_field, resolving {table.field} references to the new IDs at run time. Never hardcode IDs.",
+  "name": "Job Application Tracker",
+  "timezone_placeholder": "{{USER_TIMEZONE}}",
+  "build_order": [
+    "1. create_base with PHASE 1 tables (plain fields only; keep field order).",
+    "2. PHASE 2: create the three link fields (inverse fields are auto-created, named after the source table).",
+    "3. PHASE 3: lookups, counts, rollups, aiText, in the order listed (later fields depend on earlier ones).",
+    "4. PHASE 4: formulas (IsLatest, then Latest Context), then Current State rollup (depends on Latest Context).",
+    "5. Read back with list_tables_for_base + get_table_schema and diff against this file. Store the resulting base/table/field IDs in career-kit.config.json.",
+    "6. PHASE 5: create the Reporting interface + dashboard from interface_reporting_dashboard, publish it, verify. Optionally seed one throwaway application + two emails to prove the formulas, then delete those records."
+  ],
+  "phase1_tables": {
+    "dim_Company": [
+      {
+        "name": "Name",
+        "type": "singleLineText",
+        "primary": true
+      },
+      {
+        "name": "Notes",
+        "type": "multilineText"
+      },
+      {
+        "name": "Attachments",
+        "type": "multipleAttachments"
+      },
+      {
+        "name": "Company Size",
+        "type": "singleLineText"
+      },
+      {
+        "name": "Glass Door Rating",
+        "type": "rating",
+        "options": {
+          "icon": "star",
+          "max": 5,
+          "color": "yellowBright"
+        }
+      }
+    ],
+    "dim_Application": [
+      {
+        "name": "Identifier",
+        "type": "singleLineText",
+        "primary": true,
+        "convention": "auto::<company-slug>::<role-slug-or-'unspecified-role'> for scheduler-created rows; humans may use 'Company - Role'"
+      },
+      {
+        "name": "Job Title",
+        "type": "singleLineText"
+      },
+      {
+        "name": "Notes",
+        "type": "multilineText"
+      },
+      {
+        "name": "Salary Range",
+        "type": "singleLineText"
+      },
+      {
+        "name": "Location",
+        "type": "singleLineText"
+      },
+      {
+        "name": "Flexible Work",
+        "type": "multipleSelects",
+        "options": {
+          "choices": [
+            {
+              "name": "Remote",
+              "color": "grayLight2"
+            },
+            {
+              "name": "Hybrid",
+              "color": "blueLight2"
+            },
+            {
+              "name": "In person",
+              "color": "cyanLight2"
+            }
+          ]
+        }
+      },
+      {
+        "name": "JD Link",
+        "type": "url"
+      },
+      {
+        "name": "Days in Current State",
+        "type": "number",
+        "options": {
+          "precision": 0
+        },
+        "note": "plain number, maintained by the optional weekly digest task; not a formula in the source base"
+      }
+    ],
+    "fact_email": [
+      {
+        "name": "Name",
+        "type": "singleLineText",
+        "primary": true,
+        "note": "email subject"
+      },
+      {
+        "name": "Email Body",
+        "type": "multilineText"
+      },
+      {
+        "name": "Sender",
+        "type": "singleLineText"
+      },
+      {
+        "name": "Email Context",
+        "type": "singleSelect",
+        "options": {
+          "choices": [
+            {
+              "name": "Application Received"
+            },
+            {
+              "name": "Automated/ Survey"
+            },
+            {
+              "name": "Recruiter Contact"
+            },
+            {
+              "name": "Formal Interview"
+            },
+            {
+              "name": "Offer Sent"
+            },
+            {
+              "name": "Offer Accept"
+            },
+            {
+              "name": "Offer Reject"
+            },
+            {
+              "name": "Not Job App Related"
+            },
+            {
+              "name": "Application Rejected"
+            },
+            {
+              "name": "Interview Rejected"
+            }
+          ]
+        },
+        "note": "Source base misspells the first choice 'Application Recieved'; the kit uses the correct spelling everywhere. 'Interview Rejected' exists in the source base but was missing from the original email-scrub enum - the kit includes it."
+      },
+      {
+        "name": "Attachments",
+        "type": "multipleAttachments"
+      },
+      {
+        "name": "Received",
+        "type": "dateTime",
+        "options": {
+          "dateFormat": {
+            "name": "local"
+          },
+          "timeFormat": {
+            "name": "12hour"
+          },
+          "timeZone": "{{USER_TIMEZONE}}"
+        }
+      },
+      {
+        "name": "Gmail Deeplink",
+        "type": "url",
+        "note": "https://mail.google.com/mail/u/0/#all/<threadId>"
+      }
+    ],
+    "dim_Resume": [
+      {
+        "name": "Name",
+        "type": "singleLineText",
+        "primary": true
+      },
+      {
+        "name": "Attachments",
+        "type": "multipleAttachments"
+      },
+      {
+        "name": "Generated",
+        "type": "date",
+        "options": {
+          "dateFormat": {
+            "name": "local"
+          }
+        }
+      },
+      {
+        "name": "Notes",
+        "type": "multilineText"
+      },
+      {
+        "name": "Profession",
+        "type": "multipleSelects",
+        "options": {
+          "choices": [
+            {
+              "name": "Product",
+              "color": "blueLight2"
+            },
+            {
+              "name": "Marketing",
+              "color": "cyanLight2"
+            },
+            {
+              "name": "Analytics",
+              "color": "tealLight2"
+            },
+            {
+              "name": "Engineering",
+              "color": "greenLight2"
+            },
+            {
+              "name": "Technical Product/Program",
+              "color": "yellowLight2"
+            },
+            {
+              "name": "Experimentation",
+              "color": "orangeLight2"
+            },
+            {
+              "name": "Operations",
+              "color": "redLight2"
+            },
+            {
+              "name": "Business",
+              "color": "pinkLight2"
+            },
+            {
+              "name": "Product Manager",
+              "color": "blueLight2"
+            },
+            {
+              "name": "Growth Strategy",
+              "color": "cyanLight2"
+            },
+            {
+              "name": "Digital Commerce",
+              "color": "tealLight2"
+            },
+            {
+              "name": "eCommerce",
+              "color": "greenLight2"
+            },
+            {
+              "name": "Business Strategy",
+              "color": "yellowLight2"
+            },
+            {
+              "name": "Program Management",
+              "color": "orangeLight2"
+            }
+          ]
+        },
+        "note": "Seed list from the author's role types; Setup should replace/extend it from the user's own role-type bases."
+      },
+      {
+        "name": "Type",
+        "type": "singleSelect",
+        "options": {
+          "choices": [
+            {
+              "name": "Generic",
+              "color": "blueLight2"
+            },
+            {
+              "name": "Custom",
+              "color": "cyanLight2"
+            },
+            {
+              "name": "Base",
+              "color": "blueLight2"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "phase2_links": [
+    {
+      "table": "dim_Application",
+      "name": "Company",
+      "linksTo": "dim_Company",
+      "auto_inverse": "dim_Company.dim_Application",
+      "note": "source has 'prefer single record' on; the API cannot set it - tell the user to tick it in the UI (optional, cosmetic)"
+    },
+    {
+      "table": "fact_email",
+      "name": "Application",
+      "linksTo": "dim_Application",
+      "auto_inverse": "dim_Application.fact_email"
+    },
+    {
+      "table": "dim_Application",
+      "name": "Resume Used",
+      "linksTo": "dim_Resume",
+      "auto_inverse": "dim_Resume.dim_Application",
+      "note": "source has 'prefer single record' on; same UI-only note"
+    }
+  ],
+  "phase3_derived": [
+    {
+      "table": "dim_Company",
+      "name": "Count Applications",
+      "type": "count",
+      "recordLinkField": "dim_Application"
+    },
+    {
+      "table": "dim_Application",
+      "name": "Name (from Company)",
+      "type": "multipleLookupValues",
+      "recordLinkField": "Company",
+      "lookup": "dim_Company.Name"
+    },
+    {
+      "table": "dim_Application",
+      "name": "Company Size (from Company)",
+      "type": "multipleLookupValues",
+      "recordLinkField": "Company",
+      "lookup": "dim_Company.Company Size"
+    },
+    {
+      "table": "dim_Application",
+      "name": "Glass Door Rating (from Company)",
+      "type": "multipleLookupValues",
+      "recordLinkField": "Company",
+      "lookup": "dim_Company.Glass Door Rating"
+    },
+    {
+      "table": "dim_Application",
+      "name": "Name (from Resume Used)",
+      "type": "multipleLookupValues",
+      "recordLinkField": "Resume Used",
+      "lookup": "dim_Resume.Name"
+    },
+    {
+      "table": "dim_Application",
+      "name": "Attachments (from Resume Used)",
+      "type": "multipleLookupValues",
+      "recordLinkField": "Resume Used",
+      "lookup": "dim_Resume.Attachments"
+    },
+    {
+      "table": "dim_Application",
+      "name": "Count Emails",
+      "type": "count",
+      "recordLinkField": "fact_email"
+    },
+    {
+      "table": "dim_Application",
+      "name": "Latest Date",
+      "type": "rollup",
+      "recordLinkField": "fact_email",
+      "rollupField": "fact_email.Received",
+      "formula": "MAX(values)",
+      "note": "API reports result type 'date' (display only); the stored value keeps the time and IsLatest's minute-level compare works - verified on test data"
+    },
+    {
+      "table": "dim_Application",
+      "name": "First Date",
+      "type": "rollup",
+      "recordLinkField": "fact_email",
+      "rollupField": "fact_email.Received",
+      "formula": "MIN(values)"
+    },
+    {
+      "table": "dim_Application",
+      "name": "All States",
+      "type": "rollup",
+      "recordLinkField": "fact_email",
+      "rollupField": "fact_email.Email Context",
+      "formula": "ARRAYUNIQUE(values)"
+    },
+    {
+      "table": "fact_email",
+      "name": "Latest Date (from Application)",
+      "type": "multipleLookupValues",
+      "recordLinkField": "Application",
+      "lookup": "dim_Application.Latest Date"
+    },
+    {
+      "table": "fact_email",
+      "name": "First Date (from Application)",
+      "type": "multipleLookupValues",
+      "recordLinkField": "Application",
+      "lookup": "dim_Application.First Date"
+    },
+    {
+      "table": "fact_email",
+      "name": "Identifier (from Application)",
+      "type": "multipleLookupValues",
+      "recordLinkField": "Application",
+      "lookup": "dim_Application.Identifier"
+    },
+    {
+      "table": "fact_email",
+      "name": "Job Title (from Application)",
+      "type": "multipleLookupValues",
+      "recordLinkField": "Application",
+      "lookup": "dim_Application.Job Title"
+    },
+    {
+      "table": "dim_Company",
+      "name": "Attachment Summary",
+      "type": "aiText",
+      "prompt": [
+        "Summarize these attachments: ",
+        {
+          "field": "Attachments"
+        }
+      ],
+      "description": "An AI generated summary of the Attachments field. Upload files to Attachments to generate a summary.",
+      "note": "cells generate on demand in the Airtable UI"
+    },
+    {
+      "table": "fact_email",
+      "name": "Attachment Summary",
+      "type": "aiText",
+      "prompt": [
+        "Summarize these attachments: ",
+        {
+          "field": "Attachments"
+        }
+      ],
+      "description": "An AI generated summary of the Attachments field. Upload files to Attachments to generate a summary."
+    },
+    {
+      "table": "dim_Resume",
+      "name": "Attachment Summary",
+      "type": "aiText",
+      "prompt": [
+        "Summarize these attachments: ",
+        {
+          "field": "Attachments"
+        }
+      ],
+      "description": "An AI generated summary of the Attachments field. Upload files to Attachments to generate a summary."
+    }
+  ],
+  "phase4_formulas": [
+    {
+      "table": "fact_email",
+      "name": "IsLatest",
+      "type": "formula",
+      "description": "Checks if the Received date matches the Latest Date from Application.",
+      "formula": "IF(ISERROR( IS_SAME({Received}, {Latest Date (from Application)}, 'minute')),IF({Email Context}=\"Application Rejected\",1,IS_SAME({Received}, {Latest Date (from Application)}, 'minute')),IS_SAME({Received}, {Latest Date (from Application)}, 'minute'))",
+      "note": "identical to the source base; referenced by field name here, the API rewrites to IDs"
+    },
+    {
+      "table": "fact_email",
+      "name": "Latest Context",
+      "type": "formula",
+      "description": "Helper (career-kit): Email Context only on the newest email of an application; feeds dim_Application.Current State.",
+      "formula": "IF({IsLatest}=1,{Email Context},BLANK())",
+      "deviation_from_source": "NEW helper field. In the source base 'Current State' is a conditional rollup (filtered to the latest email). The Airtable API cannot create rollup filters, so the kit reproduces the same result with this helper. Result verified: 2 same-day emails -> Current State = ['Formal Interview']."
+    },
+    {
+      "table": "dim_Application",
+      "name": "Current State",
+      "type": "rollup",
+      "recordLinkField": "fact_email",
+      "rollupField": "fact_email.Latest Context",
+      "formula": "ARRAYUNIQUE(ARRAYCOMPACT(values))",
+      "warning": "Create with ARRAYCOMPACT on the first try: rollup formulas cannot be edited through the API afterwards (update_field only edits formula fields) and fields cannot be deleted through the connector."
+    }
+  ],
+  "optional_extension_fact_interview": {
+    "$comment": "NOT in the source base. Optional module offered by Setup; powers the interview prep/follow-up reminder task. If declined, the reminder task derives interviews from fact_email rows with Email Context = Formal Interview.",
+    "table": "fact_interview",
+    "fields": [
+      {
+        "name": "Name",
+        "type": "singleLineText",
+        "primary": true,
+        "note": "e.g. 'Company - Round 2'"
+      },
+      {
+        "name": "Round",
+        "type": "singleLineText"
+      },
+      {
+        "name": "Interview Date",
+        "type": "dateTime",
+        "options": {
+          "dateFormat": {
+            "name": "local"
+          },
+          "timeFormat": {
+            "name": "12hour"
+          },
+          "timeZone": "{{USER_TIMEZONE}}"
+        }
+      },
+      {
+        "name": "Format",
+        "type": "singleSelect",
+        "options": {
+          "choices": [
+            {
+              "name": "Phone"
+            },
+            {
+              "name": "Video"
+            },
+            {
+              "name": "Onsite"
+            }
+          ]
+        }
+      },
+      {
+        "name": "Interviewers",
+        "type": "multilineText"
+      },
+      {
+        "name": "Prep Link",
+        "type": "url"
+      },
+      {
+        "name": "Thank-you Sent",
+        "type": "checkbox",
+        "options": {
+          "icon": "check",
+          "color": "greenBright"
+        }
+      },
+      {
+        "name": "Notes",
+        "type": "multilineText",
+        "note": "interview logistics only; outcomes go in dim_Application / fact_email per the Experience-Context rule"
+      }
+    ],
+    "link": {
+      "name": "Application",
+      "linksTo": "dim_Application"
+    }
+  },
+  "interface_reporting_dashboard": {
+    "$comment": "Validated 2026-10-15 in a scratch base via create_interface + create_page + publish_interface; tile filters confirmed with list_records_for_page (Rejected=0, Interview Loops=1, Real Engagement=1, Stale=1 once Days in Current State>=14). Filters in the source base were not readable, so these are the author's intent inferred from tile titles. Field names resolve to IDs at run time; select choices are not used in filters (Current State/All States are text rollups, so 'contains' on the choice name).",
+    "interface_name": "Reporting",
+    "page_name": "Applications Reporting Dashboard",
+    "page_type": "dashboard",
+    "note_on_filters": "recordScopeFilters are hard-set per SECTION, so each filtered big-number tile is its own single-element section. Charts/pivot/list share one unfiltered section.",
+    "sections": [
+      {
+        "table": "dim_Application",
+        "title": "Total Applications Submitted",
+        "filter": null,
+        "elements": [
+          {
+            "type": "number",
+            "label": "Total Applications Submitted",
+            "description": "Since search start",
+            "metric": "recordCount"
+          }
+        ]
+      },
+      {
+        "table": "dim_Application",
+        "title": "Application Stale",
+        "filter": {
+          "operator": "and",
+          "operands": [
+            {
+              "operator": ">=",
+              "operands": [
+                "{dim_Application.Days in Current State}",
+                14
+              ]
+            },
+            {
+              "operator": "doesNotContain",
+              "operands": [
+                "{dim_Application.Current State}",
+                "Rejected"
+              ]
+            },
+            {
+              "operator": "doesNotContain",
+              "operands": [
+                "{dim_Application.Current State}",
+                "Offer"
+              ]
+            }
+          ]
+        },
+        "elements": [
+          {
+            "type": "number",
+            "label": "Application Stale",
+            "description": "2+ weeks with no contact",
+            "metric": "recordCount"
+          }
+        ],
+        "dependency": "Days in Current State is a plain number; the email-scrub task must refresh it daily (see scheduled-tasks/email-scrub STEP 4b) or this tile never fires."
+      },
+      {
+        "table": "dim_Application",
+        "title": "Rejected Application",
+        "filter": {
+          "operands": [
+            {
+              "operator": "contains",
+              "operands": [
+                "{dim_Application.Current State}",
+                "Application Rejected"
+              ]
+            }
+          ]
+        },
+        "elements": [
+          {
+            "type": "number",
+            "label": "Rejected Application",
+            "description": "Blame the bots",
+            "metric": "recordCount"
+          }
+        ]
+      },
+      {
+        "table": "dim_Application",
+        "title": "Applications with Real Engagement",
+        "filter": {
+          "operator": "or",
+          "operands": [
+            {
+              "operator": "contains",
+              "operands": [
+                "{dim_Application.All States}",
+                "Recruiter Contact"
+              ]
+            },
+            {
+              "operator": "contains",
+              "operands": [
+                "{dim_Application.All States}",
+                "Formal Interview"
+              ]
+            }
+          ]
+        },
+        "elements": [
+          {
+            "type": "number",
+            "label": "Applications with Real Engagement",
+            "description": "Human contact made",
+            "metric": "recordCount"
+          }
+        ]
+      },
+      {
+        "table": "dim_Application",
+        "title": "Interview Loops",
+        "filter": {
+          "operands": [
+            {
+              "operator": "contains",
+              "operands": [
+                "{dim_Application.All States}",
+                "Formal Interview"
+              ]
+            }
+          ]
+        },
+        "elements": [
+          {
+            "type": "number",
+            "label": "Interview Loops",
+            "description": "Applications that reached a formal interview",
+            "metric": "recordCount"
+          }
+        ]
+      },
+      {
+        "table": "dim_Application",
+        "title": "Interview Rejected",
+        "filter": {
+          "operands": [
+            {
+              "operator": "contains",
+              "operands": [
+                "{dim_Application.Current State}",
+                "Interview Rejected"
+              ]
+            }
+          ]
+        },
+        "elements": [
+          {
+            "type": "number",
+            "label": "Interview Rejected",
+            "description": "Rejected after interviewing",
+            "metric": "recordCount"
+          }
+        ]
+      },
+      {
+        "table": "dim_Application",
+        "title": "Pipeline breakdown",
+        "filter": null,
+        "elements": [
+          {
+            "type": "barChart",
+            "title": "Applications by Current State",
+            "xAxisFieldId": "{dim_Application.Current State}",
+            "aggregation": "recordCount"
+          },
+          {
+            "type": "barChart",
+            "title": "Company Charting",
+            "xAxisFieldId": "{dim_Application.Company}",
+            "aggregation": {
+              "fieldId": "{dim_Application.Identifier}",
+              "function": "distinct"
+            }
+          },
+          {
+            "type": "barChart",
+            "title": "Average Emails per Application by Current State",
+            "xAxisFieldId": "{dim_Application.Current State}",
+            "aggregation": {
+              "fieldId": "{dim_Application.Count Emails}",
+              "function": "average"
+            }
+          },
+          {
+            "type": "pivotTable",
+            "title": "Applications by State and Company",
+            "rowDimension": {
+              "fieldId": "{dim_Application.Current State}",
+              "sort": {
+                "type": "group",
+                "order": "ascending"
+              },
+              "showTotals": true
+            },
+            "columnDimension": {
+              "fieldId": "{dim_Application.Company}",
+              "sort": {
+                "type": "value",
+                "order": "descending"
+              },
+              "showTotals": false
+            },
+            "summary": {
+              "fieldId": "{dim_Application.Identifier}",
+              "function": "countUnique"
+            }
+          },
+          {
+            "type": "list",
+            "title": "Applications by Current State",
+            "hierarchyLevels": {
+              "level1": {
+                "tableId": "{dim_Application}",
+                "fieldIds": [
+                  "{dim_Application.Identifier}",
+                  "{dim_Application.Location}",
+                  "{dim_Application.Flexible Work}",
+                  "{dim_Application.Count Emails}",
+                  "{dim_Application.Current State}"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "after_create": "publish_interface, then read back with list_pages_for_base and verify each tile with list_records_for_page(elementId): a freshly created base returns 0 for every filtered tile, which is expected."
+  },
+  "scheduled_task_field_map": {
+    "$comment": "Placeholders the task templates use; Setup fills them from the build read-back.",
+    "{{AT_BASE_ID}}": "base id",
+    "{{AT_TBL_COMPANY}}": "dim_Company table id",
+    "{{AT_FLD_COMPANY_NAME}}": "dim_Company.Name",
+    "{{AT_TBL_APPLICATION}}": "dim_Application table id",
+    "{{AT_FLD_APP_IDENTIFIER}}": "dim_Application.Identifier",
+    "{{AT_FLD_APP_TITLE}}": "dim_Application.Job Title",
+    "{{AT_FLD_APP_COMPANY}}": "dim_Application.Company",
+    "{{AT_TBL_EMAIL}}": "fact_email table id",
+    "{{AT_FLD_EMAIL_NAME}}": "fact_email.Name",
+    "{{AT_FLD_EMAIL_BODY}}": "fact_email.Email Body",
+    "{{AT_FLD_EMAIL_SENDER}}": "fact_email.Sender",
+    "{{AT_FLD_EMAIL_CONTEXT}}": "fact_email.Email Context",
+    "{{AT_FLD_EMAIL_RECEIVED}}": "fact_email.Received",
+    "{{AT_FLD_EMAIL_APPLICATION}}": "fact_email.Application",
+    "{{AT_FLD_EMAIL_DEEPLINK}}": "fact_email.Gmail Deeplink",
+    "{{AT_TBL_RESUME}}": "dim_Resume table id"
+  }
+}
