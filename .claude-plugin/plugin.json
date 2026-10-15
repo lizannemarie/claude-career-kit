@@ -9,5 +9,19 @@
   "homepage": "https://github.com/lizannemarie/claude-career-kit",
   "repository": "https://github.com/lizannemarie/claude-career-kit",
   "license": "MIT",
-  "keywords": ["job-search", "resume", "ats", "cover-letter", "interview", "airtable", "career"]
+  "keywords": [
+    "job-search",
+    "resume",
+    "ats",
+    "cover-letter",
+    "interview",
+    "airtable",
+    "career"
+  ],
+  "dependencies": [
+    {
+      "name": "humanizer",
+      "marketplace": "humanizer"
+    }
+  ]
 }

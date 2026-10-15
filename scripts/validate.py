@@ -114,6 +114,19 @@ for name, files in sorted(used.items()):
     if name not in defined:
         errors.append("undefined placeholder %s in %s" % (name, ", ".join(sorted(files))))
 
+# 3b. Third-party Humanizer: declared as a dependency, never vendored
+pj = json.load(open(os.path.join(ROOT, ".claude-plugin", "plugin.json")))
+mj = json.load(open(os.path.join(ROOT, ".claude-plugin", "marketplace.json")))
+dep = {"name": "humanizer", "marketplace": "humanizer"}
+if dep not in pj.get("dependencies", []):
+    errors.append("plugin.json: missing dependency %s" % dep)
+if "humanizer" not in mj.get("allowCrossMarketplaceDependenciesOn", []):
+    errors.append("marketplace.json: allowCrossMarketplaceDependenciesOn must include 'humanizer'")
+for d, dirs, files in os.walk(ROOT):
+    dirs[:] = [x for x in dirs if not x.startswith(".")]
+    if os.path.basename(d).lower() == "humanizer" and "SKILL.md" in files:
+        errors.append("vendored Humanizer found at %s: depend on github.com/blader/humanizer instead" % rel(d))
+
 # 4. Schema references
 r = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "airtable-plan.py"), "check"],
                    capture_output=True, text=True)

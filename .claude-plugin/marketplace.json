@@ -6,13 +6,27 @@
     "url": "https://github.com/lizannemarie"
   },
   "description": "Install career-kit, an AI-assisted job search toolkit for Claude Code and Cowork.",
+  "allowCrossMarketplaceDependenciesOn": [
+    "humanizer"
+  ],
   "plugins": [
     {
       "name": "career-kit",
       "source": "./",
       "description": "Guided job-search setup, resume ATS evaluation, cover letters, interview prep, Airtable tracker, and daily scheduled checks.",
       "license": "MIT",
-      "keywords": ["job-search", "resume", "ats", "career"]
+      "keywords": [
+        "job-search",
+        "resume",
+        "ats",
+        "career"
+      ],
+      "dependencies": [
+        {
+          "name": "humanizer",
+          "marketplace": "humanizer"
+        }
+      ]
     }
   ]
 }
