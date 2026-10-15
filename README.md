@@ -52,7 +52,7 @@ The interviews take the longest (about 20–40 minutes). Everything after that i
 Scheduled tasks run on your computer while the Claude app is open. A task that comes due while the app is closed runs when you next open it.
 
 ## Cost and usage
-The scheduled tasks use your Claude plan's usage every day. The job-board check is the heaviest because it opens many web pages. To keep usage down, it sends most of the page reading to small, cheap subagents and grep-searches large logs instead of reading them in full. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for measurements. You can change times, pause a task in the app's Scheduled section, or lower the number of rotation companies in the config.
+The scheduled tasks use your Claude plan's usage every day. The job-board check is the heaviest because it opens many web pages. To keep usage down, a script fetches and filters company job feeds before any model reads them, it runs inline (an eval found that cheaper than subagents at typical sizes), and it grep-searches large logs instead of reading them in full. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for measurements. You can change times, pause a task in the app's Scheduled section, or lower the number of rotation companies in the config.
 
 ## Commands and skills
 | Command / skill | Use it to |

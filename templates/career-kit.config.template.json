@@ -236,7 +236,8 @@
     "{{AT_FLD_INT_PREP_LINK}}": "airtable/fields/fact_interview/Prep Link",
     "{{AT_FLD_INT_THANKYOU}}": "airtable/fields/fact_interview/Thank-you Sent",
     "{{AT_FLD_INT_APPLICATION}}": "airtable/fields/fact_interview/Application",
-    "{{SPLIT_MIN_EMAIL_THREADS}}": "split_thresholds/email_min_threads"
+    "{{SPLIT_MIN_EMAIL_THREADS}}": "split_thresholds/email_min_threads",
+    "{{SPLIT_MIN_POSTINGS}}": "split_thresholds/jobboard_min_postings"
   },
   "runtime_placeholders": [
     "{{MONTH}}",
@@ -253,7 +254,8 @@
     "{{DATE}}"
   ],
   "split_thresholds": {
-    "$comment": "Set from evals/split-decision/report.md. Below these sizes the flow runs inline.",
-    "email_min_threads": 10
+    "$comment": "From evals/split-decision (2026-10-15): inline was cheaper and faster at every tested size (email up to 30 threads, job board up to 18 postings) with identical quality. Flows run inline below these sizes; above them (untested) they may fan out to protect the context. Re-run the eval to change them.",
+    "email_min_threads": 31,
+    "jobboard_min_postings": 19
   }
 }

@@ -81,14 +81,33 @@ python3 evals/split-decision/run_eval.py --sizes 5 10 20 40            # ~24 hea
 python3 evals/split-decision/run_eval.py --with-mcp --sizes 10 20      # include your connectors (realistic overhead)
 ```
 
-**Status:** written and dry-run tested (workloads, commands and scoring). Not yet run: headless `claude -p` was logged out on the build machine. Until it runs, the email threshold stays at 10 and the job-board check always splits (scoped). The job-board choice still rests on the latency win and on parent-context protection for 20–60 real pages, not on measured cost.
+### Results (2026-10-15)
+
+The sweep ran on a Pro plan, with the 5-hour usage meter going from 38% to 52%. The parent and inline runs used Sonnet; subagents used their shipped models (Haiku scouts and classifier, Sonnet verifier). Every run was 100% correct against ground truth.
+
+| Flow | N | inline | split, scoped tools | split, all tools |
+|---|---|---|---|---|
+| email | 10 | $0.048 · 13 s | $0.109 · 18 s | $0.273 · 38 s |
+| email | 30 | $0.063 · 14 s | $0.177 · 40 s | $0.446 · 64 s |
+| job board | 6 | $0.087 · 52 s | $0.375 · 200 s (4 subagents) | not run |
+| job board | 18 | $0.132 · 60 s | $0.872 · 214 s (11 subagents) | not run |
+
+What the results show:
+- **No break-even in the tested range.** Inline cost grows slowly with N because the work stays in one cached context. Split cost grows with the number of subagents, since each pays its own overhead and cache writes.
+- **Scoping tools cuts the split cost by about 60%** (email: $0.273 → $0.109 and $0.446 → $0.177) but does not close the gap.
+- **Split was slower too.** It was slower at every size, and much slower on the job board, because verifiers start only after the scouts finish.
+- **Quality is the same.** Final scores differed by 6–8 points on average between the variants, with the same keep/screen/exclude decisions.
+
+**Decision:** both flows now run **inline by default**. `split_thresholds` is set just above the largest tested size (email 31 threads, job board 19 postings), so fan-out happens only on runs larger than anything measured, purely to protect the context.
+
+**Caveat:** the fixtures are small and local. Postings run about 150 words, emails about 400 characters, and nothing is fetched from the web. Real postings are 3–5k tokens each and real emails can be far longer, which favors splitting more than this test does. The prefetch script (`scripts/fetch-feeds.py`) now drops most feed content before any model reads it, which shrinks that gap further. To test real sizes, re-run with larger fixtures or `--with-mcp` against your own data.
 
 ## Decision table
 
 | Skill / task | Inline or split | Why | Model tier | Estimated token effect |
 |---|---|---|---|---|
-| **job-board-check** (scheduled) | **Split.** Stage 1: one `posting-scout` per source batch (Indeed/job-board MCP; Greenhouse aggregator; every-run company feeds; rotation; discovery). Stage 2: one `posting-verifier` per posting with first pass ≥ 70. The parent keeps dedup (grep), logging, tracker republish, and notifications. | (a) independent sources run in parallel; (b) bulky page fetches reduce to compact JSON; (c) Haiku is enough for the first pass | scouts: Haiku; verifier: Sonnet (configurable) | Parent context drops from roughly 60–300k of page text to under 10k of JSON. Total tokens rise ≈54k per subagent but shift to cheaper tiers. About 30% faster. **Inline fallback** when the Agent tool or connectors are missing in the task session. |
-| **email-scrub** (scheduled) | **Split only when ≥ 10 threads need fetching** (at least one full batch). Each `email-classifier` batch of about 10 does get_thread (PLAIN_TEXT, then FULL_CONTENT/HTML fallback), cleans and caps the body, classifies, **appends entries to the cache file**, and returns compact JSON without bodies. The parent does Airtable upserts from the cache, then STEP 4b and the summary. Under 10 threads it runs inline. | (b) raw thread fetches with HTML fallbacks are bulky; (c) Haiku classified 10/10. Below one batch, the 54k overhead outweighs the saving. | Haiku | Raw/HTML fetch noise and classification reasoning stay out of the parent. Bodies still pass through the parent once at Airtable-write time, as before, so the saving is moderate. Cache-before-write ordering is kept: classifiers append before the parent writes anything. |
+| **job-board-check** (scheduled) | **Inline by default** (measured: 4–6.6× cheaper and 3.5–4× faster at 6–18 postings, same decisions). Fans out to `posting-scout` / `posting-verifier` only at 19+ postings to open, to protect the context on unusually large runs. Source C is prefetched and filtered by `scripts/fetch-feeds.py` before any model reads it. | Split overhead exceeded the bulk saving at every measured size; the script removes the bulk without a model | parent: task model; scouts Haiku, verifier Sonnet when split | Measured; see Results. |
+| **email-scrub** (scheduled) | **Inline by default** (measured: 2.3–2.8× cheaper at 10–30 threads, same accuracy). Fans out to `email-classifier` batches only at 31+ threads to fetch. Cache-before-write ordering is unchanged. | Split overhead exceeded the saving at every measured size | Haiku classifier when split | Measured; see Results. |
 | **resume-ats-eval** | **Inline** | The posting text is needed again for tailoring, the re-score, and the cover letter, so a rubric-builder subagent would re-read it and add ≈54k overhead for no context saving. Steps are sequential and interactive. | Session model | No split. Savings come from progressive disclosure (rubric, ledger, ATS signals, logging, and calibration live in `references/`) and a targeted Experience-Context digest instead of a full read. |
 | **career-focus-interview** | **Inline** | Interactive, one question at a time, stateful | Session model | None |
 | **experience-context-builder** | **Inline.** A subagent is used only to **merge or summarize an archive over about 50 KB** into a section map before editing. | Interactive and stateful; (b) applies only to very large archives | Haiku for the map | Avoids loading a 100 KB+ archive whole; edits target anchored sections. |
