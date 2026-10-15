@@ -67,7 +67,15 @@
     "job_board_queries": [],
     "greenhouse_aggregator_query": "",
     "rotation_batch_size": 5,
-    "discovery_industries": ["retail/grocery", "travel/hospitality", "insurance/financial services", "healthcare", "logistics", "media/gaming", "consumer apps"]
+    "discovery_industries": [
+      "retail/grocery",
+      "travel/hospitality",
+      "insurance/financial services",
+      "healthcare",
+      "logistics",
+      "media/gaming",
+      "consumer apps"
+    ]
   },
   "preferences": {
     "resume_rules": [],
@@ -89,10 +97,37 @@
       "fact_interview": ""
     },
     "fields": {
-      "dim_Company": {"Name": ""},
-      "dim_Application": {"Identifier": "", "Job Title": "", "Company": "", "JD Link": "", "Current State": "", "Latest Date": "", "Days in Current State": ""},
-      "fact_email": {"Name": "", "Email Body": "", "Sender": "", "Email Context": "", "Received": "", "Application": "", "Gmail Deeplink": ""},
-      "fact_interview": {"Name": "", "Interview Date": "", "Round": "", "Format": "", "Interviewers": "", "Prep Link": "", "Thank-you Sent": "", "Application": ""}
+      "dim_Company": {
+        "Name": ""
+      },
+      "dim_Application": {
+        "Identifier": "",
+        "Job Title": "",
+        "Company": "",
+        "JD Link": "",
+        "Current State": "",
+        "Latest Date": "",
+        "Days in Current State": ""
+      },
+      "fact_email": {
+        "Name": "",
+        "Email Body": "",
+        "Sender": "",
+        "Email Context": "",
+        "Received": "",
+        "Application": "",
+        "Gmail Deeplink": ""
+      },
+      "fact_interview": {
+        "Name": "",
+        "Interview Date": "",
+        "Round": "",
+        "Format": "",
+        "Interviewers": "",
+        "Prep Link": "",
+        "Thank-you Sent": "",
+        "Application": ""
+      }
     },
     "interface_id": "",
     "dashboard_page_id": ""
@@ -102,9 +137,20 @@
     "artifact_url": ""
   },
   "schedules": {
-    "job_board_check": {"cron": "30 8 * * *", "task_id": "career-kit-job-board-check"},
-    "email_scrub": {"cron": "0 7 * * *", "task_id": "career-kit-email-scrub"},
-    "interview_reminders": {"cron": "0 7 * * *", "task_id": "career-kit-interview-reminders", "prep_hours_before": 24, "followup_days_after": 1}
+    "job_board_check": {
+      "cron": "30 8 * * *",
+      "task_id": "career-kit-job-board-check"
+    },
+    "email_scrub": {
+      "cron": "0 7 * * *",
+      "task_id": "career-kit-email-scrub"
+    },
+    "interview_reminders": {
+      "cron": "0 7 * * *",
+      "task_id": "career-kit-interview-reminders",
+      "prep_hours_before": 24,
+      "followup_days_after": 1
+    }
   },
   "notifications": {
     "email_to": "",
@@ -189,13 +235,25 @@
     "{{AT_FLD_INT_INTERVIEWERS}}": "airtable/fields/fact_interview/Interviewers",
     "{{AT_FLD_INT_PREP_LINK}}": "airtable/fields/fact_interview/Prep Link",
     "{{AT_FLD_INT_THANKYOU}}": "airtable/fields/fact_interview/Thank-you Sent",
-    "{{AT_FLD_INT_APPLICATION}}": "airtable/fields/fact_interview/Application"
+    "{{AT_FLD_INT_APPLICATION}}": "airtable/fields/fact_interview/Application",
+    "{{SPLIT_MIN_EMAIL_THREADS}}": "split_thresholds/email_min_threads"
   },
   "runtime_placeholders": [
-    "{{MONTH}}", "{{DAY}}", "{{YEAR}}", "{{PREVIOUS_DATE}}",
-    "{{SCORE}}", "{{JOB_TITLE}}", "{{COMPANY}}", "{{LOCATION}}",
+    "{{MONTH}}",
+    "{{DAY}}",
+    "{{YEAR}}",
+    "{{PREVIOUS_DATE}}",
+    "{{SCORE}}",
+    "{{JOB_TITLE}}",
+    "{{COMPANY}}",
+    "{{LOCATION}}",
     "{{PAY_RANGE_OR_not listed}}",
     "{{ONE_LINE_FIT_NOTE: top two matching strengths, main genuine gap}}",
-    "{{DIRECT_URL}}", "{{DATE}}"
-  ]
+    "{{DIRECT_URL}}",
+    "{{DATE}}"
+  ],
+  "split_thresholds": {
+    "$comment": "Set from evals/split-decision/report.md. Below these sizes the flow runs inline.",
+    "email_min_threads": 10
+  }
 }

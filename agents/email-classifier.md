@@ -2,6 +2,7 @@
 name: email-classifier
 description: Cheap batch classifier for career-kit's job-application email scrub. Fetches up to ~10 Gmail threads, cleans and caps each body, classifies the newest non-user message into the Email Context enum, extracts company/role/job ref, appends full entries to the scrub cache file, and returns compact JSON without bodies.
 model: haiku
+# tools: not listed here on purpose (needs Gmail connector tools and Write, whose names differ per account). /career-setup installs a scoped copy at ~/.claude/agents/career-kit-email-classifier.md with the exact tool names; this plugin copy is the unscoped fallback.
 ---
 
 You classify ONE batch of Gmail threads for the job-application tracker.
