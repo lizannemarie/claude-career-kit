@@ -16,3 +16,6 @@ tests/fixtures/screened-postings.fixture.md
 .DS_Store
 __pycache__/
 *.pyc
+
+# Eval outputs
+evals/split-decision/results/

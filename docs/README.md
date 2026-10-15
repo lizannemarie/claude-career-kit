@@ -7,4 +7,5 @@
 | [CUSTOMIZING.md](CUSTOMIZING.md) | you want to change search criteria, schedules, models, or templates |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | something failed |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | you want to know how the kit keeps token use down, with measurements |
+| [../evals/split-decision/README.md](../evals/split-decision/README.md) | you want to measure inline vs subagent cost on your own setup |
 | [../airtable/README.md](../airtable/README.md) | you want to understand or rebuild the Airtable base and dashboard |

@@ -19,7 +19,7 @@ Never split small sequential steps. Subagents get file paths and config values, 
 | Can a **scheduled-task session** spawn subagents with the Agent tool? | **Yes.** A temporary probe task ran with no files and no connectors. It spawned a `model: haiku` subagent in the foreground and got the exact JSON back (54,121 subagent tokens, 4.8 s). The probe was deleted afterwards. |
 | Does the `model` override take effect? | The parameter was accepted without error. The tool result does not say which model actually ran, so the override itself is unconfirmed. |
 | Can a subagent see MCP connectors? | **Yes**, in an interactive session: Gmail, Airtable, job-board MCPs, WebFetch, WebSearch, Chrome. Not separately probed inside a scheduled-task session, so the task templates keep an **inline fallback** (see below). |
-| Fixed cost of one subagent | **≈ 54k tokens** before any work (system prompt and tool definitions, mostly served from the prompt cache). This is the number that decides whether a split pays off. |
+| Fixed cost of one subagent | **≈ 54k tokens** for an *unscoped* subagent (`general-purpose`), and **≈ 8k** for one limited to two tools. See "Where the subagent overhead comes from" below. |
 
 ## Measurements on fixtures
 
@@ -40,12 +40,48 @@ Every run used synthetic fixtures in `tests/fixtures/` (fictional people and com
 
 ### What the numbers say
 
-1. **On small fixtures a split always costs more in total tokens.** Each extra subagent adds ≈54k of fixed context, and the fixture work is only 10–20k. Overhead tokens are mostly cache reads, which are much cheaper than fresh input, but they are not free.
+1. **On small fixtures a split always costs more in total tokens.** Each extra *unscoped* subagent adds ≈54k of fixed context (≈8–15k once scoped, see below), and the fixture work is only 10–20k. Overhead tokens are mostly cache reads, which are much cheaper than fresh input, but they are not free.
 2. **Splitting pays off when the bulk is large.** The live job-board run opens 20–60 posting pages a day (the source logs show "50+ screened"). At roughly 3–5k tokens per page, that is 60–300k tokens. Inline, all of it piles into one context that is re-read on every later turn and risks compaction. Split, each scout absorbs its own pages and the parent gets about 150 tokens of JSON per posting. That benefit is extrapolated from page sizes, not measured end to end on a live run.
 3. **Parallel fan-out cut wall time by about 30%** (44 s → 31 s) with identical decisions.
 4. **Haiku matched the strongest model on classification and extraction** (10/10). That makes it the right tier for classification, scouting, and digesting.
 5. **Sonnet was adequate but slightly less skeptical than the inline strongest model** (+2 on P1, mostly by fully crediting SQL experience that was 6 years old). The verifier prompt therefore has an explicit **recency rule**: evidence older than 5 years caps at 75% unless the posting only asks for familiarity. The verifier stays on Sonnet. Users who want maximum skepticism can set `models.verifier` to `opus` in config.
 6. **grep beats reading screened-postings.md** by two to three orders of magnitude, so the logs are never read whole.
+
+## Where the subagent overhead comes from (and how the kit cuts it)
+
+The same trivial task ("reply OK", Haiku, no tool calls) was run through built-in agent types that load different toolsets, on 2026-10-15, in a session with about 15 MCP connectors attached:
+
+| Agent type | Tools loaded | Tokens before any work |
+|---|---|---|
+| `general-purpose` | every built-in tool plus every connected MCP server's tools | **54.7k** |
+| `claude-code-guide` | Bash, Read, WebFetch, WebSearch, plus a long system prompt | 24.0k |
+| `statusline-setup` | Read, Edit | **7.8k** |
+
+**So the 54k is not inherent to subagents.** About 85% of it is tool definitions. A subagent with no `tools:` list inherits every connector in the session (design tools, meeting recorders, docs search, browser and desktop control, and so on). Whether that is excessive depends on the setup: it is expected for an unscoped agent in a connector-heavy session, and avoidable for career-kit, whose subagents need two to eight tools each. Mitigations, in order of impact:
+
+1. **Scope tools (shipped).** `posting-verifier` (Read, Grep, Glob, WebFetch) and `web-researcher` (Read, Grep, Glob, WebFetch, WebSearch) carry `tools:` lists in the plugin. `posting-scout` and `email-classifier` need connector tools whose exact names differ per account, so `/career-setup` writes scoped user-level copies (`~/.claude/agents/career-kit-*.md`) with the resolved names. The scheduled tasks prefer those copies and fall back to the unscoped plugin agents, then to `general-purpose`. Expected overhead: ≈8–15k per subagent. This is an estimate from the probe above; confirm it with the eval below.
+2. **Prompt caching already discounts the overhead.** The fixed context is identical across spawns, so after the first spawn it is mostly cache reads, which are billed at a fraction of fresh input. Raw token counts overstate the cost. That is why the eval compares dollars (`total_cost_usd`), not tokens.
+3. **Fewer, larger batches.** Overhead is paid per spawn, so fan out per source (5 scouts), not per company. A possible next step is to verify postings in groups of 2–3 per verifier instead of one each; measure the quality impact first with the eval.
+4. **Do bulk fetching without a model.** Greenhouse/Lever/Ashby JSON feeds can be fetched, filtered by title, location and date, and deduped against the logs by a script before any model reads them. This would remove most of source C's reading (not built yet; proposed follow-up).
+5. **Thresholds, not always-split.** Below a measured size, run inline. `split_thresholds` in config holds the numbers, and the email scrub already reads `email_min_threads`.
+6. **Fewer connectors per task session.** Overhead also scales with what the session has attached. Disconnecting connectors the user doesn't need shrinks both inline and unscoped runs.
+
+### The split-decision eval
+
+`evals/split-decision/run_eval.py` settles inline vs split with measured dollar cost. It runs each flow at several workload sizes N in three variants through headless Claude Code:
+- `inline`
+- `split-scoped`: subagents defined with `tools:` lists, as shipped
+- `split-unscoped`: subagents that inherit every tool, as the original measurement did
+
+For each run it records `total_cost_usd`, tokens (fresh, cache read, cache write, output), wall time, and quality: email label accuracy against ground truth, and job-board keep/screen/exclude accuracy plus mean score drift against the inline run. Its report gives the **break-even N** per flow, the smallest N where split-scoped costs no more than inline with quality within 95%, and prints the `split_thresholds` block to paste into config.
+
+```bash
+python3 evals/split-decision/run_eval.py --dry-run                     # free: show the plan
+python3 evals/split-decision/run_eval.py --sizes 5 10 20 40            # ~24 headless runs
+python3 evals/split-decision/run_eval.py --with-mcp --sizes 10 20      # include your connectors (realistic overhead)
+```
+
+**Status:** written and dry-run tested (workloads, commands and scoring). Not yet run: headless `claude -p` was logged out on the build machine. Until it runs, the email threshold stays at 10 and the job-board check always splits (scoped). The job-board choice still rests on the latency win and on parent-context protection for 20–60 real pages, not on measured cost.
 
 ## Decision table
 
