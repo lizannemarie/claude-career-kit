@@ -40,6 +40,9 @@ Every run used synthetic fixtures in `tests/fixtures/` (fictional people and com
 
 ### What the numbers say
 
+_These were the first, token-only measurements. Points 2 and 3 were superseded by the cost-based eval below (see Results), which found inline cheaper and faster at every tested size._
+
+
 1. **On small fixtures a split always costs more in total tokens.** Each extra *unscoped* subagent adds ≈54k of fixed context (≈8–15k once scoped, see below), and the fixture work is only 10–20k. Overhead tokens are mostly cache reads, which are much cheaper than fresh input, but they are not free.
 2. **Splitting pays off when the bulk is large.** The live job-board run opens 20–60 posting pages a day (the source logs show "50+ screened"). At roughly 3–5k tokens per page, that is 60–300k tokens. Inline, all of it piles into one context that is re-read on every later turn and risks compaction. Split, each scout absorbs its own pages and the parent gets about 150 tokens of JSON per posting. That benefit is extrapolated from page sizes, not measured end to end on a live run.
 3. **Parallel fan-out cut wall time by about 30%** (44 s → 31 s) with identical decisions.
@@ -129,9 +132,9 @@ What the results show:
 
 Scheduled-task prompts cannot assume the plugin is loaded in the task session. Setup therefore copies these agent definitions into `<workspace>/.career-kit/agents/`. The task tells the model to use `career-kit:<agent>` when it is available, and otherwise to spawn `general-purpose` with the `model` override and the instructions from that file.
 
-## Inline fallback (scheduled tasks)
+## Inline is the default; split is the exception (scheduled tasks)
 
-Each task checks for the Agent tool at the start. If the tool is missing, or a subagent reports that it cannot reach a required connector, the task runs the same steps inline in the stated order. That inline path is the proven source logic. It records `mode=inline` in `job-search-runs.md` so the user can see which path ran.
+Both daily tasks run inline unless the work exceeds `split_thresholds` (above the largest size the eval tested). In split mode, if the Agent tool is missing or a subagent can't reach a required connector, the task finishes that part inline. Each run records `mode=inline` or `mode=split` in `job-search-runs.md` (job board) or the run summary (email scrub).
 
 ## Re-running the measurements
 

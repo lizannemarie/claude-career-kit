@@ -34,6 +34,9 @@ Cron expressions in your local time. To change them: edit them here and re-run t
 | `classifier` | haiku | email classification |
 | `researcher` | haiku | digesting interviewer and company sources |
 
+## Inline vs subagents (`split_thresholds`)
+`email_min_threads` (31) and `jobboard_min_postings` (19) set the size at which a daily task fans out to subagents; below them it runs inline, which `evals/split-decision/` measured as cheaper. Re-run that eval on your own data to tune them.
+
 ## Templates
 `templates/tracker-template.html` controls the tracker look. Keep the `.howto` element, the card markup and the Tailor-button script, because the daily task depends on them. The other `templates/*.template.md` files only seed new files and never overwrite existing ones.
 
