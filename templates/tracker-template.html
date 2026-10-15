@@ -1,0 +1,264 @@
+<title>{{TRACKER_TITLE}}</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #1a1a1a;
+    --text-sub: #6b6b68;
+    --card-bg: #fdfcf9;
+    --card-border: #e4e2d8;
+    --day-header-text: #444441;
+    --empty-text: #888780;
+    --score-high-bg: #EAF3DE;
+    --score-high-fg: #27500A;
+    --score-mid-bg: #FAEEDA;
+    --score-mid-fg: #633806;
+    --meta-text: #5f5e5a;
+    --pay-text: #0F6E56;
+    --note-text: #888780;
+    --apply-text: #185FA5;
+    --apply-border: #b5d4f4;
+    --apply-bg: #ffffff;
+    --apply-hover-bg: #E6F1FB;
+    --tailor-text: #534AB7;
+    --tailor-border: #cecbf6;
+    --tailor-bg: #ffffff;
+    --tailor-hover-bg: #EEEDFE;
+    --tailor-copied-text: #27500A;
+    --tailor-copied-border: #97C459;
+    --tailor-copied-bg: #EAF3DE;
+    --howto-bg: #F1EFE8;
+    --howto-text: #5f5e5a;
+    --legend-text: #888780;
+    --note-banner-bg: #FCEFEA;
+    --note-banner-border: #EAC3B3;
+    --note-banner-text: #7A3A22;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #17160f;
+      --text: #f1efe7;
+      --text-sub: #a9a79b;
+      --card-bg: #201f17;
+      --card-border: #38362a;
+      --day-header-text: #c9c7b8;
+      --empty-text: #8b8979;
+      --score-high-bg: #21351a;
+      --score-high-fg: #9ed97e;
+      --score-mid-bg: #3a2c12;
+      --score-mid-fg: #f0c17a;
+      --meta-text: #b7b5a6;
+      --pay-text: #57d9ae;
+      --note-text: #8b8979;
+      --apply-text: #85c0f5;
+      --apply-border: #2f4c66;
+      --apply-bg: #201f17;
+      --apply-hover-bg: #24384c;
+      --tailor-text: #b6acf7;
+      --tailor-border: #3c3766;
+      --tailor-bg: #201f17;
+      --tailor-hover-bg: #29264e;
+      --tailor-copied-text: #9ed97e;
+      --tailor-copied-border: #4f7a2e;
+      --tailor-copied-bg: #21351a;
+      --howto-bg: #262418;
+      --howto-text: #c9c7b8;
+      --legend-text: #8b8979;
+      --note-banner-bg: #33241c;
+      --note-banner-border: #6b4331;
+      --note-banner-text: #f0b89c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #17160f;
+    --text: #f1efe7;
+    --text-sub: #a9a79b;
+    --card-bg: #201f17;
+    --card-border: #38362a;
+    --day-header-text: #c9c7b8;
+    --empty-text: #8b8979;
+    --score-high-bg: #21351a;
+    --score-high-fg: #9ed97e;
+    --score-mid-bg: #3a2c12;
+    --score-mid-fg: #f0c17a;
+    --meta-text: #b7b5a6;
+    --pay-text: #57d9ae;
+    --note-text: #8b8979;
+    --apply-text: #85c0f5;
+    --apply-border: #2f4c66;
+    --apply-bg: #201f17;
+    --apply-hover-bg: #24384c;
+    --tailor-text: #b6acf7;
+    --tailor-border: #3c3766;
+    --tailor-bg: #201f17;
+    --tailor-hover-bg: #29264e;
+    --tailor-copied-text: #9ed97e;
+    --tailor-copied-border: #4f7a2e;
+    --tailor-copied-bg: #21351a;
+    --howto-bg: #262418;
+    --howto-text: #c9c7b8;
+    --legend-text: #8b8979;
+    --note-banner-bg: #33241c;
+    --note-banner-border: #6b4331;
+    --note-banner-text: #f0b89c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px;
+    padding-block: 24px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  .sub { font-size: 13px; color: var(--text-sub); margin: 0 0 20px; }
+  .banner {
+    font-size: 12.5px; color: var(--note-banner-text);
+    background: var(--note-banner-bg); border: 1px solid var(--note-banner-border);
+    border-radius: 8px; padding: 10px 12px; margin-bottom: 16px;
+  }
+  .day-group { margin-bottom: 28px; }
+  .day-header {
+    font-size: 13px; font-weight: 600; color: var(--day-header-text);
+    text-transform: uppercase; letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--card-border); padding-bottom: 6px; margin-bottom: 10px;
+  }
+  .empty-day { font-size: 13px; color: var(--empty-text); font-style: italic; }
+  .card {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 14px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    background: var(--card-bg);
+  }
+  @media (max-width: 480px) {
+    .card { grid-template-columns: 1fr; }
+    .score { justify-self: start; }
+    .actions { flex-direction: row; }
+  }
+  .score {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .score-high { background: var(--score-high-bg); color: var(--score-high-fg); }
+  .score-mid { background: var(--score-mid-bg); color: var(--score-mid-fg); }
+  .title { font-size: 14px; font-weight: 600; margin: 0 0 2px; color: var(--text); }
+  .meta { font-size: 12.5px; color: var(--meta-text); margin: 0; }
+  .pay { font-size: 12.5px; color: var(--pay-text); font-weight: 500; margin-top: 2px; }
+  .note { font-size: 12px; color: var(--note-text); margin-top: 4px; }
+  .actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+  a.apply, button.tailor {
+    font-size: 13px; font-weight: 500;
+    text-decoration: none; border-radius: 7px;
+    padding: 7px 12px; white-space: nowrap;
+    font-family: inherit; cursor: pointer;
+  }
+  a.apply {
+    color: var(--apply-text); border: 1px solid var(--apply-border); background: var(--apply-bg);
+    text-align: center;
+  }
+  a.apply:hover { background: var(--apply-hover-bg); }
+  button.tailor {
+    color: var(--tailor-text); border: 1px solid var(--tailor-border); background: var(--tailor-bg);
+  }
+  button.tailor:hover { background: var(--tailor-hover-bg); }
+  button.tailor.copied { color: var(--tailor-copied-text); border-color: var(--tailor-copied-border); background: var(--tailor-copied-bg); }
+  .legend { font-size: 12px; color: var(--legend-text); margin-top: 20px; }
+  .howto {
+    font-size: 12px; color: var(--howto-text); background: var(--howto-bg);
+    border-radius: 8px; padding: 10px 12px; margin-bottom: 20px;
+  }
+</style>
+
+<div class="wrap">
+
+<h1>Job search tracker</h1>
+<p class="sub">Daily results from the scheduled job-board check. Most recent day first.</p>
+<p class="howto">"Tailor resume" copies a ready-made prompt to your clipboard. Paste it into a chat with Claude to kick off the resume-ats-eval skill for that specific posting.</p>
+
+<!-- DAY-GROUP TEMPLATE: the daily task inserts a new group immediately AFTER the .howto element. Use .empty-day when there are zero qualifying postings (or the run errored, stating the reason). Alternate score-high (>=70) / score-mid (55-69). -->
+<div class="day-group">
+  <div class="day-header">{{MONTH}} {{DAY}}, {{YEAR}}</div>
+
+  <div class="card">
+    <div class="score score-high">{{SCORE}}</div>
+    <div>
+      <p class="title">{{JOB_TITLE}}</p>
+      <p class="meta">{{COMPANY}} &middot; {{LOCATION}}</p>
+      <p class="pay">{{PAY_RANGE_OR_not listed}}</p>
+      <p class="note">{{ONE_LINE_FIT_NOTE: top two matching strengths, main genuine gap}}</p>
+    </div>
+    <div class="actions">
+      <a class="apply" href="{{DIRECT_URL}}" target="_blank" rel="noopener">Apply &rarr;</a>
+      <button class="tailor" data-title="{{JOB_TITLE}}" data-company="{{COMPANY}}" data-url="{{DIRECT_URL}}">Tailor resume</button>
+    </div>
+  </div>
+</div>
+
+<div class="day-group">
+  <div class="day-header">{{PREVIOUS_DATE}}</div>
+  <div class="empty-day">No qualifying postings today.</div>
+</div>
+
+<p class="legend">Score = weighted match against the posting's own requirements (resume-ats-eval approach). {{MIN_SCORE}}+ shown here; postings below that bar, or outside {{LOCATION_RULE}} + {{SALARY_FLOOR}} minimum, are screened out before this list.</p>
+
+</div>
+
+<script>
+(function () {
+  function buildPrompt(btn) {
+    var title = btn.getAttribute('data-title');
+    var company = btn.getAttribute('data-company');
+    var url = btn.getAttribute('data-url');
+    return 'Run the resume-ats-eval skill for this posting: "' + title + '" at ' + company +
+      '. Posting link: ' + url +
+      '. Score my resume against it and produce a tailored version.';
+  }
+
+  function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+  }
+
+  document.querySelectorAll('button.tailor').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = buildPrompt(btn);
+      var done = function () {
+        var original = btn.textContent;
+        btn.textContent = 'Copied';
+        btn.classList.add('copied');
+        setTimeout(function () {
+          btn.textContent = original;
+          btn.classList.remove('copied');
+        }, 1800);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(function () {
+          fallbackCopy(text);
+          done();
+        });
+      } else {
+        fallbackCopy(text);
+        done();
+      }
+    });
+  });
+})();
+</script>
+
