@@ -144,7 +144,9 @@
     },
     "email_scrub": {
       "cron": "0 7 * * *",
-      "task_id": "career-kit-email-scrub"
+      "task_id": "career-kit-email-scrub",
+      "lookback_days": 1,
+      "first_run_window": "30d"
     },
     "interview_reminders": {
       "cron": "0 7 * * *",
@@ -238,7 +240,9 @@
     "{{AT_FLD_INT_THANKYOU}}": "airtable/fields/fact_interview/Thank-you Sent",
     "{{AT_FLD_INT_APPLICATION}}": "airtable/fields/fact_interview/Application",
     "{{SPLIT_MIN_EMAIL_THREADS}}": "split_thresholds/email_min_threads",
-    "{{SPLIT_MIN_POSTINGS}}": "split_thresholds/jobboard_min_postings"
+    "{{SPLIT_MIN_POSTINGS}}": "split_thresholds/jobboard_min_postings",
+    "{{SCRUB_LOOKBACK_DAYS}}": "schedules/email_scrub/lookback_days",
+    "{{SCRUB_FIRST_RUN_WINDOW}}": "schedules/email_scrub/first_run_window"
   },
   "runtime_placeholders": [
     "{{MONTH}}",

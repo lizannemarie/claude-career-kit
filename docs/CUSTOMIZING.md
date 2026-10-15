@@ -24,7 +24,7 @@ Edit `company-notes.md`: add every-run companies (with JSON feeds where possible
 `resume_rules`, `writing` and `cover_letter` are short imperative rules applied by the resume and letter skills, for example "Don't name domain gaps in cover letters" or "Vary hook and structure across letters to the same company". Edit them directly or with `/career-update-context`.
 
 ## Schedules (`schedules`)
-Cron expressions in your local time. To change them: edit them here and re-run the scheduled_tasks phase, or change them in the app's Scheduled section (then update the config to match).
+Cron expressions in your local time. The email scrub also has `lookback_days` (1: each run re-checks the day before its last run, so nothing slips through) and `first_run_window` (`30d`: how far back the very first run searches). To change them: edit them here and re-run the scheduled_tasks phase, or change them in the app's Scheduled section (then update the config to match).
 
 ## Models (`models`)
 | Key | Default | Used for |
