@@ -123,7 +123,10 @@ def prompt(flow, variant, w, batch):
     ask = ("Postings: %s (criteria at the top). Candidate facts: %s (never credit 'Honest Boundaries and Gaps'). "
            "Apply the filters, first-pass score, and the skeptical second pass for first-pass >= 70. "
            "Output ONLY a JSON array of {\"id\",\"status\":\"candidate|screened|excluded\",\"score\":int|null} "
-           "for every posting, where score is the final score." % (w["input"], w["context"]))
+           "for every posting, where score is the final score. Status definitions: excluded = an excluded "
+           "category (no score needed); screened = opened and ruled out by location, pay below the floor, or a "
+           "final score below the minimum; candidate = passes every filter with a final score at or above the "
+           "minimum (after the second pass when one applies)." % (w["input"], w["context"]))
     if variant == "inline":
         return "Do this yourself without subagents. " + ask
     return ("Split the postings into batches of %d and spawn the `scout` subagent per batch, in parallel, giving each "
@@ -238,27 +241,37 @@ def main():
     ap.add_argument("--timeout", type=int, default=900)
     ap.add_argument("--tolerance", type=float, default=0.95)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--out", help="results folder to append to (lets you run one size/variant at a time)")
+    ap.add_argument("--report-only", action="store_true", help="rebuild report.md from --out/runs.jsonl")
     a = ap.parse_args()
     if not a.dry_run and not shutil.which("claude"):
         sys.exit("claude CLI not found on PATH")
 
-    out = os.path.join(HERE, "results", dt.datetime.now().strftime("%Y%m%d-%H%M%S"))
+    out = a.out or os.path.join(HERE, "results", dt.datetime.now().strftime("%Y%m%d-%H%M%S"))
     os.makedirs(out, exist_ok=True)
-    rows = []
+    runs_path = os.path.join(out, "runs.jsonl")
+    prior = [json.loads(l) for l in open(runs_path)] if os.path.exists(runs_path) else []
+    if a.report_only:
+        print(json.dumps(report(prior, out, a.tolerance)))
+        return
+    rows = list(prior)
     for flow in a.flows:
         for n in a.sizes:
             work = tempfile.mkdtemp(prefix="ck-eval-")
             w = (build_email if flow == "email" else build_jobboard)(n, work)
-            baseline = None
+            baseline = next(({r.get("id"): r for r in p["parsed"]} for p in prior
+                             if p["flow"] == flow and p["n"] == n and p["variant"] == "inline" and p.get("parsed")),
+                            None)
             for variant in a.variants:
                 res = run_claude(prompt(flow, variant, w, a.batch), flow, variant, work, a)
                 row = {"flow": flow, "n": n, "variant": variant, **{k: v for k, v in res.items() if k != "result"}}
                 if "cost_usd" in res:
+                    row["parsed"] = parse_array(res["result"])
                     row["quality"] = score(flow, w, res, baseline)
                     if variant == "inline" and flow == "jobboard":
                         baseline = {r.get("id"): r for r in parse_array(res["result"])}
                 rows.append(row)
-                print(json.dumps(row), flush=True)
+                print(json.dumps({k: v for k, v in row.items() if k not in ("parsed", "models")}), flush=True)
                 with open(os.path.join(out, "runs.jsonl"), "a") as f:
                     f.write(json.dumps(row) + "\n")
             shutil.rmtree(work, ignore_errors=True)
