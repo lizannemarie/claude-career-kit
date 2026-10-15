@@ -1,0 +1,28 @@
+# Logging to the Job Application Tracker (Airtable)
+
+Read this whenever SKILL.md step 12/12a says to log a resume or application record — the mechanics live here so routine scoring/tailoring runs don't have to load them.
+
+## Step 12: Log the resume to `dim_Resume`
+
+Every time step 9 produces a new tailored resume — including a re-tailor of a posting already logged — record it. This is a standing step, not optional, and not just for first-time runs.
+
+- **Find the base and table.** Use `airtable.base_id` and `airtable.tables.dim_Resume` from `career-kit.config.json` when present. If they are missing or the call fails with a not-found error, fall back to `search_bases` for "Job Application Tracker" and `list_tables_for_base`, and tell the user to re-run `/career-setup` to refresh the IDs.
+- **Check for an existing record first.** Look for a `dim_Resume` record whose Name already matches this company/role (e.g. via `list_records_for_table` filtered or scanned by Name). If one exists — this is a re-tailor, see "Re-running after a manual edit" in SKILL.md — update it (`update_records_for_table`) rather than creating a duplicate: refresh Generated and Notes.
+- **Fields to set** (create with `create_records_for_table` if no match found):
+  - **Name** — `"<Company> — <Role, shortened>"`, matching the existing style in the table (e.g. "Fabrikam Goods — Sr PM Checkout Experience"), not the raw filename.
+  - **Generated** — today's date.
+  - **Notes** — a couple of sentences: the posting's req/job ID if the posting listed one, the before → after ATS score from step 10, any hard-filter risk flagged in step 6a, and the full local path to the actual resume file (career folder path + filename) since the Attachments field can't be populated automatically — see below.
+  - **Profession** — pick 1–2 tags from the table's *existing* Profession options only (e.g. Product, Marketing, Analytics, Engineering, Technical Product/Program, Experimentation, Operations, Business — confirm the live option list with `list_tables_for_base`/`get_table_schema` rather than assuming this list is still current, and never invent a new option value) based on what the role actually is.
+  - **Type** — if this is a role-type base resume rather than a posting-tailored one, set `Type = Base` (distinct from the default posting-tailored resumes) so SKILL.md's "Inputs needed" section can find it later by filtering on this field.
+- **Attachments — known limitation, flag it every time.** Airtable's Attachments field only accepts a file via a public URL or its own native file picker; neither the Airtable API/MCP tools nor browser automation (Claude in Chrome, computer use) can push a local file into it directly: Airtable doesn't expose a standard file-input element for this, and computer-use browser access is read-only. So after creating/updating the record, say plainly in the delivery summary that the resume file still needs to be dragged into that record's Attachments field by hand, and name the record so it's easy to find in the grid.
+- If the Airtable tools aren't available in the session, or the base/table can't be found, don't block delivery on it — say so in the summary and move on; this is an addition to the workflow, not a gate on it.
+
+## Step 12a: Create or update a stub application record in `dim_Application`
+
+Whenever step 12 creates or updates a `dim_Resume` record, also create or update the matching `dim_Application` record in the same base — this is a standing step, not optional, and it's what step 0's duplicate check reads from on future runs, so skipping it here defeats that check next time.
+
+- Use the same base already resolved in step 12; `list_tables_for_base` to confirm `dim_Application` and `dim_Company` (re-resolve table IDs by name each time rather than hardcoding them).
+- **Check for an existing record first** — this may already be the same record step 0 found at the start of this run. Search `dim_Application` by JD Link (exact URL match) or, if no URL, by Company (linked) + Job Title.
+  - **If found:** update it rather than creating a duplicate. Set/refresh the JD Link (if missing or changed) and Resume Used (link to the `dim_Resume` record from step 12). Leave Current State, `fact_email` links, and any other application-lifecycle/status field untouched unless the user explicitly gives you new status information — those fields reflect real-world application progress that this skill doesn't track on its own, and overwriting them would erase real signal (e.g. an existing "Interview" status).
+  - **If not found:** find the employer in `dim_Company` (create a new `dim_Company` record if none matches, using the employer's name as it appears on the posting), then create a new `dim_Application` record with: **Identifier/Name** (e.g. "<Company> - <Job Title, shortened>", matching the table's existing naming style), **Job Title**, **Company** (linked), **JD Link** (the posting URL — if the user only pasted text with no URL, leave this blank rather than guessing one), **Resume Used** (linked to the `dim_Resume` record from step 12), and **Location**/**Salary Range** if the posting states them plainly. Do not set Current State or any other application-lifecycle/status field on a newly created stub — a stub records that a tailored resume exists for this posting, not that the application has been submitted or tracked through any particular stage; leave status to the user's existing tracking process (e.g. a `fact_email` link) to populate.
+- If the Airtable tools aren't available, or the base/table can't be found, don't block delivery on it — say so in the summary and move on, same as step 12.
