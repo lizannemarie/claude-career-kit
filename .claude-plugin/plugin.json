@@ -1,0 +1,13 @@
+{
+  "name": "career-kit",
+  "version": "0.1.0",
+  "description": "AI-assisted job search for Claude Code and Cowork: guided setup, career-focus and experience interviews, ATS-style resume evaluation, cover letters, interview prep, an Airtable application tracker, and daily scheduled job-board and email checks.",
+  "author": {
+    "name": "lizannemarie",
+    "url": "https://github.com/lizannemarie"
+  },
+  "homepage": "https://github.com/lizannemarie/claude-career-kit",
+  "repository": "https://github.com/lizannemarie/claude-career-kit",
+  "license": "MIT",
+  "keywords": ["job-search", "resume", "ats", "cover-letter", "interview", "airtable", "career"]
+}

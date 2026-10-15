@@ -1,0 +1,18 @@
+# Personal configuration and data: never commit
+career-kit.config.json
+workspace/
+.job-tracker-cache/
+.career-kit/
+*.docx
+*.pdf
+
+# Local privacy denylist (your name, employers, email)
+.privacy-denylist
+
+# Large generated fixture (regenerate with tests/fixtures/gen_screened.py)
+tests/fixtures/screened-postings.fixture.md
+
+# OS / editor
+.DS_Store
+__pycache__/
+*.pyc
