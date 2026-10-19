@@ -46,9 +46,11 @@ PAY_RX = re.compile(r"\$\s?\d[\d,.]*\s?[kK]?(?:\s?(?:USD|CAD))?\s?(?:-|–|—|t
 URL_RX = re.compile(r"https?://[^\s)>\]`\"']+")
 COUNTRY_ALIASES = {
     "US": ["us", "usa", "u s", "u s a", "united states", "united states of america", "america"],
-    "CA": ["ca", "canada"],
+    "CA": ["canada"],  # not "ca": it collides with California in "City, CA"
     "GB": ["uk", "gb", "united kingdom", "great britain", "england", "london"],
 }
+US_STATE_RX = re.compile(r",\s*(AL|AK|AZ|AR|CA|CO|CT|DE|DC|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|"
+                         r"NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY)\b")
 # Places that mean "not the remote country" when a remote posting names them and not ours.
 FOREIGN = ["canada", "uk", "united kingdom", "england", "ireland", "germany", "france", "spain",
            "netherlands", "poland", "portugal", "india", "mexico", "brazil", "argentina", "colombia",
@@ -114,8 +116,17 @@ def money(lo, hi, cur, unit=""):
     if lo is None and hi is None:
         return None
     sym = "$" if (cur or "USD").upper() == "USD" else (cur.upper() + " ")
-    rng = sym + f(lo) if hi in (None, lo) else "%s%s - %s%s" % (sym, f(lo), sym, f(hi))
+    if lo is None:
+        rng = "up to " + sym + f(hi)
+    elif hi in (None, lo):
+        rng = sym + f(lo)
+    else:
+        rng = "%s%s - %s%s" % (sym, f(lo), sym, f(hi))
     return rng + (" " + unit if unit else "")
+
+
+def dollars(cents):
+    return cents / 100 if isinstance(cents, (int, float)) and cents > 0 else None
 
 
 # ---- feed adapters: return a list of normalized jobs ----------------------------------------
@@ -125,7 +136,7 @@ def from_greenhouse(data):
     for j in data.get("jobs", []):
         pay = None
         for r in j.get("pay_input_ranges") or []:
-            pay = money(r.get("min_cents", 0) / 100, r.get("max_cents", 0) / 100, r.get("currency_type"))
+            pay = money(dollars(r.get("min_cents")), dollars(r.get("max_cents")), r.get("currency_type"))
             break
         jobs.append({
             "jobId": str(j.get("id", "")), "title": j.get("title", ""),
@@ -236,40 +247,64 @@ def every_run_feeds(notes):
     return feeds, no_feed
 
 
+LEAD_DATE_RX = re.compile(r"^\s*(?:[-*]\s*)?(20\d\d-\d\d-\d\d)(?!\d)")
+
+
 def tail_dates(paths, n=40):
-    best = None
+    """Latest leading date (the run/log date column) in the last n lines; ignores dates inside notes."""
+    best, today = None, dt.date.today()
     for p in paths:
         try:
             lines = open(p, encoding="utf-8").read().splitlines()[-n:]
         except OSError:
             continue
         for line in lines:
-            for d in DATE_RX.findall(line):
-                try:
-                    d = dt.date.fromisoformat(d)
-                except ValueError:
-                    continue
-                best = d if best is None or d > best else best
+            m = LEAD_DATE_RX.match(line)
+            if not m:
+                continue
+            try:
+                d = dt.date.fromisoformat(m.group(1))
+            except ValueError:
+                continue
+            if d <= today and (best is None or d > best):
+                best = d
     return best
 
 
+TRACKING_PARAMS = re.compile(r"^(utm_.*|gh_src|source|src|ref|referrer|lever-source.*|trk.*)$", re.I)
+
+
+def norm_url(url):
+    """Scheme/host lowercased, trailing slash dropped, tracking params removed, other params kept."""
+    u = urllib.parse.urlparse(url.strip().rstrip(".,;|"))
+    q = sorted((k, v) for k, v in urllib.parse.parse_qsl(u.query) if not TRACKING_PARAMS.match(k))
+    return urllib.parse.urlunparse((u.scheme.lower(), u.netloc.lower(), u.path.rstrip("/"), "",
+                                    urllib.parse.urlencode(q), ""))
+
+
 class Seen:
-    """grep -F style lookups over job-search-log.md + screened-postings.md."""
+    """Exact lookups over job-search-log.md + screened-postings.md, indexed once.
+
+    URLs match exactly after normalization (never by prefix or by the URL minus its query, which
+    would collide for boards that use ?gh_jid=N). Job ids match whole tokens; company+title match
+    the second and third table cells."""
+
+    TOKEN_RX = re.compile(r"[\w-]+")
 
     def __init__(self, texts):
-        self.text = "\n".join(texts)
-        self.pairs = set()
-        for line in self.text.splitlines():
+        self.urls, self.tokens, self.pairs = set(), set(), set()
+        for line in "\n".join(texts).splitlines():
+            self.urls.update(norm_url(u) for u in URL_RX.findall(line))
+            self.tokens.update(self.TOKEN_RX.findall(line))
             cells = [c.strip() for c in line.strip().strip("-* ").split("|")]
             if len(cells) >= 4:  # date | title | company | ...
                 self.pairs.add((norm(cells[1]), norm(cells[2])))
 
     def match(self, job, company):
-        url = job["url"]
-        if url and (url in self.text or url.split("?")[0].rstrip("/") in self.text):
+        if job["url"] and norm_url(job["url"]) in self.urls:
             return "url"
         jid = job["jobId"]
-        if jid and len(jid) >= 4 and re.search(r"(?<![\w-])%s(?![\w-])" % re.escape(jid), self.text):
+        if jid and len(jid) >= 4 and jid in self.tokens:
             return "jobId"
         if (norm(job["title"]), norm(company)) in self.pairs:
             return "company+title"
@@ -300,6 +335,8 @@ def location_ok(job, s):
     rc = (s.get("remote_country") or "US").upper()
     if job["country"]:
         return job["country"].upper() in (rc, norm(rc)) or norm(job["country"]) in COUNTRY_ALIASES.get(rc, [])
+    if rc != "US" and US_STATE_RX.search(joined):  # "City, CA" is California, not Canada
+        return False
     ours = COUNTRY_ALIASES.get(rc, [norm(rc)])
     if any(has_phrase(joined, a) for a in ours):
         return True
