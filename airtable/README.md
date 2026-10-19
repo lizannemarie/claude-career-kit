@@ -25,6 +25,8 @@ python3 scripts/airtable-plan.py diff --listing listing.json   # live base vs sc
 ## Reporting dashboard
 `interface_reporting_dashboard` fully specifies the "Reporting" interface. Its page "Applications Reporting Dashboard" has 6 big-number tiles, each in its own section with its own record filter: Total, Stale, Rejected, Real Engagement, Interview Loops, Interview Rejected. A shared unfiltered section holds 3 bar charts, a pivot table and a list. Setup creates it with `create_interface` / `create_page` / `publish_interface` and verifies each tile with `list_records_for_page`. A fresh base shows 0 on filtered tiles.
 
+**Applications with Real Engagement** counts applications that reached Recruiter Contact or Formal Interview and are not currently Application Rejected (a later interview rejection still counts as engagement). Number tiles count unique Identifiers.
+
 **Application Stale** counts applications with `Days in Current State >= 14` that aren't rejected or at an offer. `Days in Current State` is a plain number refreshed daily by the email scrub's STEP 4b. Note: the field's note in `schema.json` still mentions a "weekly digest task"; in the kit, the email scrub maintains it.
 
 ## Placeholders

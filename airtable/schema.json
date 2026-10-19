@@ -146,7 +146,7 @@
               "name": "Interview Rejected"
             }
           ]
-        } 
+        }
       },
       {
         "name": "Attachments",
@@ -544,7 +544,7 @@
     "interface_name": "Reporting",
     "page_name": "Applications Reporting Dashboard",
     "page_type": "dashboard",
-    "note_on_filters": "recordScopeFilters are hard-set per SECTION, so each filtered big-number tile is its own single-element section. Charts/pivot/list share one unfiltered section.",
+    "note_on_filters": "recordScopeFilters are hard-set per SECTION, so each filtered big-number tile is its own single-element section. Charts/pivot/list share one unfiltered section. Applications with Real Engagement excludes applications whose current state is Application Rejected (matches the author's live dashboard as of 2026-10-19).",
     "sections": [
       {
         "table": "dim_Application",
@@ -555,7 +555,10 @@
             "type": "number",
             "label": "Total Applications Submitted",
             "description": "Since search start",
-            "metric": "recordCount"
+            "metric": {
+              "fieldId": "{dim_Application.Identifier}",
+              "aggregation": "countUnique"
+            }
           }
         ]
       },
@@ -593,7 +596,10 @@
             "type": "number",
             "label": "Application Stale",
             "description": "2+ weeks with no contact",
-            "metric": "recordCount"
+            "metric": {
+              "fieldId": "{dim_Application.Identifier}",
+              "aggregation": "countUnique"
+            }
           }
         ],
         "dependency": "Days in Current State is a plain number; the email-scrub task must refresh it daily (see scheduled-tasks/email-scrub STEP 4b) or this tile never fires."
@@ -617,7 +623,10 @@
             "type": "number",
             "label": "Rejected Application",
             "description": "Blame the bots",
-            "metric": "recordCount"
+            "metric": {
+              "fieldId": "{dim_Application.Identifier}",
+              "aggregation": "countUnique"
+            }
           }
         ]
       },
@@ -625,20 +634,32 @@
         "table": "dim_Application",
         "title": "Applications with Real Engagement",
         "filter": {
-          "operator": "or",
+          "operator": "and",
           "operands": [
             {
-              "operator": "contains",
+              "operator": "or",
               "operands": [
-                "{dim_Application.All States}",
-                "Recruiter Contact"
+                {
+                  "operator": "contains",
+                  "operands": [
+                    "{dim_Application.All States}",
+                    "Recruiter Contact"
+                  ]
+                },
+                {
+                  "operator": "contains",
+                  "operands": [
+                    "{dim_Application.All States}",
+                    "Formal Interview"
+                  ]
+                }
               ]
             },
             {
-              "operator": "contains",
+              "operator": "doesNotContain",
               "operands": [
-                "{dim_Application.All States}",
-                "Formal Interview"
+                "{dim_Application.Current State}",
+                "Application Rejected"
               ]
             }
           ]
@@ -647,8 +668,11 @@
           {
             "type": "number",
             "label": "Applications with Real Engagement",
-            "description": "Human contact made",
-            "metric": "recordCount"
+            "description": "Human Contact Made",
+            "metric": {
+              "fieldId": "{dim_Application.Identifier}",
+              "aggregation": "countUnique"
+            }
           }
         ]
       },
@@ -670,8 +694,11 @@
           {
             "type": "number",
             "label": "Interview Loops",
-            "description": "Applications that reached a formal interview",
-            "metric": "recordCount"
+            "description": "Please love me",
+            "metric": {
+              "fieldId": "{dim_Application.Identifier}",
+              "aggregation": "count"
+            }
           }
         ]
       },
@@ -693,8 +720,11 @@
           {
             "type": "number",
             "label": "Interview Rejected",
-            "description": "Rejected after interviewing",
-            "metric": "recordCount"
+            "description": "I didn't want that job anyway",
+            "metric": {
+              "fieldId": "{dim_Application.Identifier}",
+              "aggregation": "countUnique"
+            }
           }
         ]
       },
@@ -707,7 +737,8 @@
             "type": "barChart",
             "title": "Applications by Current State",
             "xAxisFieldId": "{dim_Application.Current State}",
-            "aggregation": "recordCount"
+            "aggregation": "recordCount",
+            "description": "Total applications grouped by each pipeline stage to identify bottlenecks."
           },
           {
             "type": "barChart",
@@ -725,7 +756,8 @@
             "aggregation": {
               "fieldId": "{dim_Application.Count Emails}",
               "function": "average"
-            }
+            },
+            "description": "Shows the average number of emails exchanged per application for each current state to highlight applicant engagement levels at different stages."
           },
           {
             "type": "pivotTable",
@@ -749,7 +781,8 @@
             "summary": {
               "fieldId": "{dim_Application.Identifier}",
               "function": "countUnique"
-            }
+            },
+            "description": "Count of applications by current state and company. Use it to see which companies are engaging and where applications stall."
           },
           {
             "type": "list",
