@@ -6,6 +6,7 @@ All settings live in `<career folder>/career-kit.config.json`. After changing an
 | Key | Effect |
 |---|---|
 | `role_targets`, `level` | what scouts search for and how postings are scored |
+| `title_keywords` | optional core role phrases for the company-feed title filter (for example `product manager`, `program manager`). Empty: derived from `role_targets` with seniority words removed, so "Senior Product Manager" also matches level-less titles like "Product Manager, Payments". Seniority is reported for scoring, never used to drop a posting. |
 | `home_metro`, `metro_aliases`, `remote_country` | the location filter: fully remote in the country, or the home metro |
 | `location_rule` | the plain-English phrase shown in the tracker legend |
 | `salary_floor` (number), `salary_floor_display` (text) | applied only when a posting lists pay |

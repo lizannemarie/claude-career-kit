@@ -6,7 +6,11 @@ No model reads raw feeds: this script fetches each Greenhouse / Lever / Ashby fe
 logs, and prints compact JSON. Standard library only.
 
 Filters, in order (from career-kit.config.json -> search):
-  1. title: contains one of role_targets as a phrase (case-insensitive, punctuation ignored)
+  1. title: contains one of the core role phrases (case-insensitive, punctuation ignored). Phrases come
+     from search.title_keywords when set, else from role_targets with seniority words removed
+     ("Senior Product Manager" -> "product manager", which also matches "product management").
+     Seniority is not a filter: each candidate reports the level words its title contains
+     (titleLevel) so the scorer can weigh it.
   2. excluded_categories: phrase in the title, department or team -> dropped
   3. location: remote in remote_country (when remote_ok), or home_metro / metro_aliases in any
      listed location
@@ -58,8 +62,35 @@ FOREIGN = ["canada", "uk", "united kingdom", "england", "ireland", "germany", "f
            "latam", "asia", "united states", "usa", "us"]
 
 
+TITLE_SYNONYMS = {"sr": "senior", "snr": "senior", "jr": "junior", "mgr": "manager", "assoc": "associate",
+                  "mngr": "manager"}
+LEVEL_WORDS = ["senior", "staff", "principal", "lead", "group", "junior", "associate", "entry", "mid",
+               "i", "ii", "iii", "iv", "v", "1", "2", "3", "4"]
+
+
 def norm(s):
-    return " ".join(re.sub(r"[^a-z0-9]+", " ", (s or "").lower()).split())
+    words = re.sub(r"[^a-z0-9]+", " ", (s or "").lower()).split()
+    return " ".join(TITLE_SYNONYMS.get(w, w) for w in words)
+
+
+def core_phrases(search):
+    """Role phrases used for the title filter: title_keywords, else role_targets minus seniority words."""
+    explicit = [norm(k) for k in search.get("title_keywords") or [] if norm(k)]
+    if explicit:
+        return sorted(set(explicit))
+    out = set()
+    for t in search.get("role_targets") or []:
+        core = " ".join(w for w in norm(t).split() if w not in LEVEL_WORDS)
+        if core:
+            out.add(core)
+            if core.endswith(" manager"):
+                out.add(core[: -len("manager")] + "management")
+    return sorted(out)
+
+
+def title_level(title):
+    words = norm(title).split()
+    return [w for w in LEVEL_WORDS[:8] if w in words] or ["unspecified"]
 
 
 def has_phrase(text, phrase):
@@ -356,7 +387,7 @@ def setup_of(job):
 
 
 def filter_jobs(company, kind, jobs, s, cutoff, seen, chars, counts):
-    targets = [t for t in s.get("role_targets") or [] if t.strip()]
+    targets = core_phrases(s)
     excluded = [e for e in s.get("excluded_categories") or [] if e.strip()]
     out = []
     for j in jobs:
@@ -379,7 +410,8 @@ def filter_jobs(company, kind, jobs, s, cutoff, seen, chars, counts):
             continue
         c = {"title": j["title"], "company": company, "location": " / ".join(j["locations"]) or "not listed",
              "url": j["url"], "jobId": j["jobId"], "ats": kind,
-             "posted": j["posted"].isoformat() if j["posted"] else None, "setup": setup_of(j)}
+             "posted": j["posted"].isoformat() if j["posted"] else None, "setup": setup_of(j),
+             "titleLevel": title_level(j["title"])}
         pay = j["pay"] or (PAY_RX.search(j["text"]) or [None])[0]  # else a range stated in the text
         if pay:
             c["pay"] = " ".join(pay.split())
