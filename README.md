@@ -15,6 +15,7 @@ Your personal files stay on your computer. See [docs/PRIVACY.md](docs/PRIVACY.md
 - **Gmail**, with the Gmail connector added.
 - Optional job-board connectors: Indeed, Dice, ZipRecruiter, Snagajob, RankedIn. Without them the check uses web search and company career pages.
 - **Humanizer**, a third-party plugin by blader ([github.com/blader/humanizer](https://github.com/blader/humanizer), MIT). career-kit declares it as a dependency, so it installs automatically from GitHub with career-kit. It is not bundled in this repo.
+- For building resumes and cover letters outside Cowork: Node.js (Setup installs the `docx` package locally). LibreOffice is optional, for the visual page check.
 - Optional: the Claude in Chrome extension, for JavaScript-heavy job sites and Indeed link resolution.
 
 ## 5-minute quickstart

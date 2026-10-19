@@ -18,3 +18,5 @@
 | Two Humanizer skills, or the wrong version runs | A second copy is installed (for example one uploaded to claude.ai, shown as `humanizer@synced`) | Keep the GitHub copy `humanizer@humanizer` and uninstall the other. |
 | `render-task.py` reports EMPTY or UNKNOWN | A config value is missing | Fill the key it names in `career-kit.config.json`, or run the matching Setup phase. |
 | `check-privacy.sh` warns that the denylist is missing | No `.privacy-denylist` file at the repo root | Create it with your name, employers and email, one per line. It's gitignored. |
+| Resumes or letters can't be built ("Cannot find module 'docx'") | No .docx builder installed | Re-run `/career-setup preflight`; it offers a local `docx` install in `<workspace>/.career-kit/node`. Cowork's sandbox already has it. |
+| "Visual check skipped" after building a resume | LibreOffice isn't installed | Optional: `brew install --cask libreoffice`. The ATS structure check (`scripts/check-docx.py`) still runs without it. |

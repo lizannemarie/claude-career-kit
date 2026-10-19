@@ -18,7 +18,7 @@ Read `<workspace>/career-kit.config.json`: `paths.*`, `preferences.cover_letter`
 5. **Vary across letters.** Before drafting, list existing letters in the workspace for the same company (filenames containing the company), read their openings, and use a different hook and paragraph order.
 6. **Draft.** Opening: a specific hook from the posting. Body: 2-3 paragraphs of concrete nouns, metrics, and tools. Story-based content comes from the full archive section linked from the Detailed Story Index; never reconstruct a story from its summary or invent or round a metric. Close: human, plain call to action. One page.
 7. **Humanizer pass.** If the Humanizer skill (`humanizer:humanizer`, third-party from github.com/blader/humanizer) is available, invoke it on the full draft. Otherwise apply `references/ai-writing-markers.md` line by line. Then re-check facts: the pass must not change what is claimed.
-8. **Render and verify** with the `docx` skill: US Letter, about 1" margins, 11 pt; render to an image and confirm exactly one page.
+8. **Render and verify** with the `docx` skill: US Letter, about 1" margins, 11 pt; render to an image and confirm exactly one page. Without LibreOffice (`connectors.libreoffice` false), skip the render, keep the letter under about 400 words so it fits one page, and tell the user the page count wasn't visually checked.
 9. **Save** as `<Name>_<Company>_CoverLetter.docx` in the workspace and present the file.
 
 ## Edit-only requests
