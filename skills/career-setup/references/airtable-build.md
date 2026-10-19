@@ -18,8 +18,8 @@ Step 0 is the `create_base` payload (phase-1 tables, plain fields, field order k
 2. Read back: `list_tables_for_base` (and `get_table_schema` for all tables). Save the raw JSON to `listing.json`, then:
    `python3 <root>/scripts/airtable-plan.py ids --listing listing.json > ids.json`
 3. For each later step N, in order:
-   `python3 <root>/scripts/airtable-plan.py resolve --ids ids.json --step N [--with-interview] --timezone <tz>`
-   Call `create_field` with the resolved table ID and field. After each **link** field (it auto-creates an inverse field named after the source table), and at the end of each phase, re-read the schema and regenerate `ids.json`. `resolve` exits 1 with UNRESOLVED if a referenced field doesn't exist yet. Never guess an ID.
+   `python3 <root>/scripts/airtable-plan.py resolve --plan plan.json --ids ids.json --step N`
+   Call `create_field` with the resolved table ID and field. After each **link** field (it auto-creates an inverse field named after the source table), and at the end of each phase, re-read the schema and regenerate `ids.json`. `resolve` reads the steps from the saved `plan.json`, so the numbering always matches the plan you built from (with or without `fact_interview`). It exits 1 with UNRESOLVED if a referenced field doesn't exist yet. Never guess an ID.
 4. **Rollups cannot be edited later** (update_field only edits formulas, and fields can't be deleted through the connector). Before creating each rollup, show the resolved payload and check that the formula matches the schema exactly (`Current State` must use `ARRAYUNIQUE(ARRAYCOMPACT(values))`).
 
 ## 3. Verify (hard gate)

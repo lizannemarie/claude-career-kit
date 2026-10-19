@@ -6,7 +6,10 @@ hand-derives field order or IDs.
 
   plan      [--timezone TZ] [--with-interview]       ordered build steps (create_base, then create_field...)
   ids       --listing L.json [--config C.json]       name->id map from a list_tables_for_base/get_table_schema dump
-  resolve   --ids IDS.json --step N [...]            one step with every {table.field} reference resolved to IDs
+  resolve   --plan PLAN.json --ids IDS.json --step N [...]
+                                                     steps from the SAVED plan with every {table.field}
+                                                     reference resolved to IDs (never re-planned, so step
+                                                     numbers can't drift from the plan that was shown)
   diff      --listing L.json [--with-interview]      compare the live base to the schema (exit 1 on mismatch)
   dashboard --ids IDS.json                           interface sections with field IDs substituted
   check                                              verify every reference in the schema resolves by name
@@ -226,6 +229,7 @@ def main():
     ap.add_argument("--with-interview", action="store_true")
     ap.add_argument("--listing")
     ap.add_argument("--ids")
+    ap.add_argument("--plan", help="plan.json written by `plan` (required for resolve)")
     ap.add_argument("--config")
     ap.add_argument("--step", type=int, nargs="*")
     a = ap.parse_args()
@@ -246,9 +250,13 @@ def main():
         sys.exit(cmd_diff(schema, load(a.listing), a.with_interview))
     ids = load(a.ids)
     if a.cmd == "resolve":
-        steps = build_steps(schema, a.timezone, a.with_interview)
+        if not a.plan:
+            sys.exit("resolve needs --plan <plan.json> (the file written by `plan`), so step numbers match it")
+        steps = load(a.plan)
         out, rc = [], 0
         for n in a.step or []:
+            if not 0 <= n < len(steps) or steps[n].get("step") != n:
+                sys.exit("step %d is not in %s (it has steps 0-%d)" % (n, a.plan, len(steps) - 1))
             s, missing = resolve(steps[n], ids)
             if missing:
                 print("UNRESOLVED step %d: %s (create/read back the referenced fields first)" % (n, missing),
