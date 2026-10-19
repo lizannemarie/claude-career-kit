@@ -14,7 +14,7 @@ Use the Airtable MCP; Gmail MCP get_thread with messageFormat PLAIN_TEXT (retry 
 
 CACHE: {{WORKSPACE}}/{{CACHE_DIR}}/pending-fact-emails.json. Entry: {threadId, subject, sender, receivedIso, emailContext, companyName, roleTitle, jobRefId|null, emailBody, deeplink "https://mail.google.com/mail/u/0/#all/<threadId>"}. Last-run timestamp: {{WORKSPACE}}/{{CACHE_DIR}}/last-run.json.
 
-STEP 0 Resume the cache and check Airtable connectivity (list_tables_for_base). On an auth error retry once; if still failing, leave the cache untouched, skip the Gmail scan, and report "Airtable connection failed (looks like an expired/revoked authorization) — reauthorize the Airtable connector... N records cached and will sync automatically." Other errors: report and stop. If OK and the cache is non-empty: push via STEP 4, clear on success, continue.
+STEP 0 Resume the cache: first merge any leftover {{WORKSPACE}}/{{CACHE_DIR}}/batch-*.json files (from a run that stopped before its merge) into pending-fact-emails.json, dedup by threadId, then delete those batch files. Then check Airtable connectivity (list_tables_for_base). On an auth error retry once; if still failing, leave the cache untouched, skip the Gmail scan, and report "Airtable connection failed (looks like an expired/revoked authorization) — reauthorize the Airtable connector... N records cached and will sync automatically." Other errors: report and stop. If OK and the cache is non-empty: push via STEP 4, clear on success, continue.
 
 STEP 1 Window. Build the date clause FIRST, then the query:
 - Read `lastRunIso` from {{WORKSPACE}}/{{CACHE_DIR}}/last-run.json.

@@ -1,5 +1,5 @@
 {
-  "$comment": "career-kit configuration. /career-setup copies this to <workspace>/career-kit.config.json and fills it in. The filled copy holds personal data and IDs and is gitignored: never commit it. 'placeholder_map' maps every {{PLACEHOLDER}} used in templates/ and scheduled-tasks/ to a '/'-separated path in this file; 'runtime_placeholders' are filled per run by the tasks themselves.",
+  "$comment": "career-kit configuration. /career-setup copies this to <workspace>/career-kit.config.json and fills it in. The filled copy holds personal data and IDs and is gitignored: never commit it. 'placeholder_map' maps every {{PLACEHOLDER}} used in templates/ and scheduled-tasks/ to a '/'-separated path in this file; 'runtime_placeholders' are filled per run by the tasks themselves. connectors.humanizer: Third-party dependency from https://github.com/blader/humanizer (MIT), installed as humanizer@humanizer. true = its skill humanizer:humanizer is available; 'pending-restart' = installed, loads next session.",
   "kit_version": "0.1.0",
   "setup_progress": {
     "preflight": false,
@@ -45,8 +45,7 @@
       "ziprecruiter": null,
       "snagajob": null,
       "rankedin": null
-    },
-    "$humanizer_comment": "Third-party dependency from https://github.com/blader/humanizer (MIT), installed as humanizer@humanizer. true = its skill humanizer:humanizer is available; 'pending-restart' = installed, loads next session."
+    }
   },
   "search": {
     "role_targets": [],
