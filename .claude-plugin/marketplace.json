@@ -5,7 +5,7 @@
     "name": "lizannemarie",
     "url": "https://github.com/lizannemarie"
   },
-  "description": "Install career-kit, an AI-assisted job search toolkit for Claude Code and Cowork.",
+  "description": "Install career-kit, a fully-loaded AI-assisted job search toolkit for Claude Code and Cowork.",
   "allowCrossMarketplaceDependenciesOn": [
     "humanizer"
   ],
@@ -18,7 +18,8 @@
       "keywords": [
         "job-search",
         "resume",
-        "ats",
+        "cover-letter",
+        "interview",
         "career"
       ],
       "dependencies": [

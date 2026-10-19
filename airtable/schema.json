@@ -92,7 +92,7 @@
         "options": {
           "precision": 0
         },
-        "note": "plain number, maintained by the optional weekly digest task; not a formula in the source base"
+        "note": "plain number; not a formula in the source base"
       }
     ],
     "fact_email": [
@@ -146,8 +146,7 @@
               "name": "Interview Rejected"
             }
           ]
-        },
-        "note": "Source base misspells the first choice 'Application Recieved'; the kit uses the correct spelling everywhere. 'Interview Rejected' exists in the source base but was missing from the original email-scrub enum - the kit includes it."
+        } 
       },
       {
         "name": "Attachments",
@@ -471,7 +470,7 @@
     }
   ],
   "optional_extension_fact_interview": {
-    "$comment": "NOT in the source base. Optional module offered by Setup; powers the interview prep/follow-up reminder task. If declined, the reminder task derives interviews from fact_email rows with Email Context = Formal Interview.",
+    "$comment": "Powers the interview prep/follow-up reminder task. If declined, the reminder task derives interviews from fact_email rows with Email Context = Formal Interview.",
     "table": "fact_interview",
     "fields": [
       {
@@ -542,7 +541,6 @@
     }
   },
   "interface_reporting_dashboard": {
-    "$comment": "Validated 2026-10-15 in a scratch base via create_interface + create_page + publish_interface; tile filters confirmed with list_records_for_page (Rejected=0, Interview Loops=1, Real Engagement=1, Stale=1 once Days in Current State>=14). Filters in the source base were not readable, so these are the author's intent inferred from tile titles. Field names resolve to IDs at run time; select choices are not used in filters (Current State/All States are text rollups, so 'contains' on the choice name).",
     "interface_name": "Reporting",
     "page_name": "Applications Reporting Dashboard",
     "page_type": "dashboard",
