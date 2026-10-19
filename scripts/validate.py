@@ -17,7 +17,8 @@ import subprocess
 import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-PH = re.compile(r"\{\{[^{}]+\}\}")
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from kitconfig import PH, lookup  # noqa: E402
 errors = []
 
 
@@ -97,12 +98,10 @@ cfg = json.load(open(os.path.join(ROOT, "templates", "career-kit.config.template
 pmap = cfg.get("placeholder_map", {})
 defined = set(pmap) | set(cfg.get("runtime_placeholders", []))
 for name, path in pmap.items():
-    cur = cfg
-    for part in path.split("/"):
-        if not isinstance(cur, dict) or part not in cur:
-            errors.append("placeholder_map %s -> missing config path %s" % (name, path))
-            break
-        cur = cur[part]
+    try:
+        lookup(cfg, path)
+    except KeyError:
+        errors.append("placeholder_map %s -> missing config path %s" % (name, path))
 used = {}
 for sub in ("templates", "scheduled-tasks", "airtable", "agents"):
     for p in walk(sub, (".md", ".html", ".json")):

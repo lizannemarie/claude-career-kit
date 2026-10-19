@@ -13,7 +13,8 @@ Every {{PLACEHOLDER}} is looked up in the config's placeholder_map. Runtime plac
 (card fields the daily task fills) are left as-is. Lists render as comma-separated text,
 '~' in the workspace path expands to the user's home directory, and YAML frontmatter
 is printed to stderr (schedule info) and removed from the output. Exits 1 if any
-placeholder is unknown or renders empty (use --allow-empty to only warn).
+placeholder is unknown or renders as an empty string (use --allow-empty to only warn). Numeric
+zeros such as salary_floor 0 are valid values.
 """
 import argparse
 import json
@@ -21,16 +22,8 @@ import os
 import re
 import sys
 
-PH = re.compile(r"\{\{[^{}]+\}\}")
-
-
-def lookup(cfg, path):
-    cur = cfg
-    for part in path.split("/"):
-        if not isinstance(cur, dict) or part not in cur:
-            raise KeyError(path)
-        cur = cur[part]
-    return cur
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from kitconfig import PH, lookup  # noqa: E402
 
 
 def fmt(name, value):
@@ -94,7 +87,7 @@ def main():
         except KeyError:
             unknown.append(name + " (path " + pmap[name] + " missing in config)")
             return name
-        if v == "" or v == "0":
+        if v == "":  # a numeric 0 (for example no salary floor) is a real value, not a missing one
             empty.append(name)
         return v
 
