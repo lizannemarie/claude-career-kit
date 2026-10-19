@@ -197,6 +197,10 @@ def cmd_diff(schema, listing, with_interview):
         if d["type"] == "rollup":
             lf = live.get(d["table"], {}).get("fields", {}).get(d["name"], {})
             live_formula = (lf.get("options") or {}).get("formula")
+            if not live_formula and lf:
+                warnings.append("rollup formula %s.%s not verified: the listing has no field options "
+                                "(read back with get_table_schema, not list_tables_for_base)"
+                                % (d["table"], d["name"]))
             if live_formula and live_formula.replace(" ", "") != d["formula"].replace(" ", ""):
                 errors.append("rollup formula %s.%s: live %r, schema %r"
                               % (d["table"], d["name"], live_formula, d["formula"]))

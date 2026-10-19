@@ -45,10 +45,13 @@
       "ziprecruiter": null,
       "snagajob": null,
       "rankedin": null
-    }
+    },
+    "docx_builder": null,
+    "libreoffice": null
   },
   "search": {
     "role_targets": [],
+    "title_keywords": [],
     "level": "",
     "home_metro": "",
     "metro_aliases": [],
@@ -210,6 +213,7 @@
     "{{MODEL_SCOUT}}": "models/scout",
     "{{MODEL_VERIFIER}}": "models/verifier",
     "{{MODEL_CLASSIFIER}}": "models/classifier",
+    "{{AT_BASE_NAME}}": "airtable/base_name",
     "{{AT_BASE_ID}}": "airtable/base_id",
     "{{AT_TBL_COMPANY}}": "airtable/tables/dim_Company",
     "{{AT_FLD_COMPANY_NAME}}": "airtable/fields/dim_Company/Name",

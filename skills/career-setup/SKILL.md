@@ -1,9 +1,12 @@
 ---
 name: career-setup
-description: Idempotent, resumable setup for career-kit. Checks connectors and the Humanizer skill, creates the workspace, runs the career-focus and Experience-Context interviews, builds role-type base resumes, builds the Airtable Job Application Tracker base and Reporting dashboard from airtable/schema.json, publishes the Job Search Tracker artifact, installs the three scheduled tasks, seeds the log files, and smoke-tests everything. Use for /career-setup, first-time setup, or re-running a failed or skipped setup step.
+argument-hint: "[phase to redo, optional]"
+description: Idempotent, resumable setup for career-kit, run as /career-setup. Checks connectors and the Humanizer skill, creates the workspace, runs the career-focus and Experience-Context interviews, builds role-type base resumes, builds the Airtable Job Application Tracker base and Reporting dashboard from airtable/schema.json, publishes the Job Search Tracker artifact, installs the three scheduled tasks, seeds the log files, and smoke-tests everything. Use for /career-setup, first-time setup, or re-running a failed or skipped setup step.
 ---
 
 # career-kit setup
+
+If the user named a phase (for example `/career-setup airtable`), redo only that phase.
 
 Progress lives in `<workspace>/career-kit.config.json` → `setup_progress`. On every run, read it and skip phases already `true`, unless the user asks to redo one. Set a phase to `true` only after it fully succeeds. Tell the user which phase you are on.
 

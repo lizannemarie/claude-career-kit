@@ -23,7 +23,7 @@ Step 0 is the `create_base` payload (phase-1 tables, plain fields, field order k
 4. **Rollups cannot be edited later** (update_field only edits formulas, and fields can't be deleted through the connector). Before creating each rollup, show the resolved payload and check that the formula matches the schema exactly (`Current State` must use `ARRAYUNIQUE(ARRAYCOMPACT(values))`).
 
 ## 3. Verify (hard gate)
-Read the schema back again, save `listing.json`, then:
+Read the schema back again with `get_table_schema` for every table (it includes field options such as rollup formulas; `list_tables_for_base` does not), save the result as `listing.json`, then:
 ```
 python3 <root>/scripts/airtable-plan.py diff --listing listing.json [--with-interview]
 ```
@@ -39,7 +39,7 @@ python3 <root>/scripts/airtable-plan.py dashboard --ids ids.json > dashboard.jso
 1. `create_interface` named "Reporting".
 2. `create_page` with pageType `dashboard`, name "Applications Reporting Dashboard". Create the sections in file order. Each filtered big-number tile is its own single-element section, because `recordScopeFilters` are set per section. Map each section's `filter` to the section's recordScopeFilters, and the elements as given (number / barChart / pivotTable / list), using the resolved field IDs.
 3. `publish_interface`.
-4. Verify: `list_pages_for_base`, then `list_records_for_page` per tile. A fresh base legitimately returns 0 on every filtered tile; that is a pass. A tool error or a missing tile is a fail. Save `interface_id` and `dashboard_page_id` to config.
+4. Verify: `list_pages_for_base`, then `list_records_for_page` per tile (number tiles expose no fields, so call it without `fieldIds`; the record count is the tile value). A fresh base legitimately returns 0 on every filtered tile; that is a pass. A tool error or a missing tile is a fail. Save `interface_id` and `dashboard_page_id` to config.
 
 ## 6. Tell the user (known limits)
 a. "Prefer single record" on the Company and Resume Used links is UI-only. Optionally tick it in the field settings (cosmetic).

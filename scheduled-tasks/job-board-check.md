@@ -34,7 +34,7 @@ Scout rules (also the inline rules): for prefetched C candidates the feed is the
 1. Dedup again across batches (same URL/job key, or same company+title). Grep the log and screened files once more for each kept candidate.
 2. Excluded categories: drop without recording.
 3. Keep only fully remote or home metro.
-4. If salary listed, require >= floor; else keep.
+4. If pay is listed, keep it when the TOP of the range is >= the floor (a range that straddles the floor is kept, and its card shows the full range); drop it when even the top is below. No pay listed: keep.
 5. First-pass Match Score from the scouts (resume-ats-eval weighting); discard < {{MIN_SCORE}}.
 
 ## Stage 2: skeptical second pass (REQUIRED for first-pass >= {{SECOND_PASS_THRESHOLD}})
