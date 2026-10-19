@@ -8,6 +8,11 @@ For each flow and workload size N it runs the same job three ways through headle
   split-scoped      parent + subagents defined with a minimal `tools:` list (what career-kit ships)
   split-unscoped    parent + subagents that inherit every tool (the 54k-overhead case)
 
+Every variant runs the SAME parent session (all built-in tools loaded, as in a real task session), so
+the only difference between the split variants is the subagents' own tool lists. Runs use
+--permission-mode dontAsk with a read-only allowlist (Read, Grep, Glob, Agent): any other tool call
+is denied instead of prompted, so an unattended sweep can't write files or run shell commands.
+
 Flows (synthetic fixtures from tests/fixtures/, scaled to N by cloning with new IDs):
   email      classify N Gmail-like threads; quality = label accuracy vs ground truth
   jobboard   filter + first pass + skeptical second pass on N postings; quality = keep/screen/exclude
@@ -69,6 +74,8 @@ AGENTS = {
         },
     },
 }
+
+ALLOWED_TOOLS = ["Read", "Grep", "Glob", "Agent", "Task"]
 
 ENUM = ("Application Received, Automated/ Survey, Recruiter Contact, Formal Interview, Offer Sent, "
         "Offer Accept, Offer Reject, Not Job App Related, Application Rejected, Interview Rejected")
@@ -137,34 +144,33 @@ def prompt(flow, variant, w, batch):
 # ---------------------------------------------------------------- run + score
 def run_claude(p, flow, variant, work, a):
     cmd = ["claude", "-p", p, "--output-format", "json", "--no-session-persistence",
-           "--permission-mode", "bypassPermissions", "--add-dir", work]
+           "--permission-mode", "dontAsk", "--allowedTools", *ALLOWED_TOOLS, "--add-dir", work]
     if a.model:
         cmd += ["--model", a.model]
     if not a.with_mcp:
         cmd += ["--strict-mcp-config"]
     if a.max_budget_usd:
         cmd += ["--max-budget-usd", str(a.max_budget_usd)]
-    if variant == "inline":
-        cmd += ["--tools", "Read,Grep"]
-    else:
+    if variant != "inline":
         agents = copy.deepcopy(AGENTS[flow])
         if variant == "split-unscoped":
             for d in agents.values():
-                d.pop("tools", None)
+                d.pop("tools", None)  # inherit the parent's full toolset
         cmd += ["--agents", json.dumps(agents)]
-        if variant == "split-scoped":
-            cmd += ["--tools", "Read,Grep,Agent"]
     if a.dry_run:
         return {"cmd": cmd[:3] + ["<prompt>"] + cmd[3:], "dry_run": True}
     t0 = time.time()
-    r = subprocess.run(cmd, capture_output=True, text=True, cwd=work, timeout=a.timeout)
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, cwd=work, timeout=a.timeout)
+    except subprocess.TimeoutExpired:
+        return {"error": "timed out after %ds" % a.timeout, "wall_s": round(time.time() - t0, 1)}
     wall = time.time() - t0
     try:
         d = json.loads(r.stdout)
     except json.JSONDecodeError:
         return {"error": (r.stderr or r.stdout)[:500], "wall_s": wall}
-    if d.get("is_error"):
-        return {"error": d.get("result", "")[:500], "wall_s": wall}
+    if d.get("is_error") or d.get("total_cost_usd") is None:
+        return {"error": (d.get("result") or "no cost reported")[:500], "wall_s": wall}
     u = d.get("usage", {})
     return {"cost_usd": d.get("total_cost_usd"), "wall_s": round(wall, 1),
             "input": u.get("input_tokens"), "cache_read": u.get("cache_read_input_tokens"),
@@ -205,7 +211,7 @@ def report(rows, out, tol):
     for flow in sorted({r["flow"] for r in rows}):
         lines += ["## %s" % flow, "", "| N | variant | cost $ | wall s | input | cache read | output | quality |",
                   "|---|---|---|---|---|---|---|---|"]
-        fr = [r for r in rows if r["flow"] == flow and "cost_usd" in r]
+        fr = [r for r in rows if r["flow"] == flow and r.get("cost_usd") is not None and r.get("quality")]
         for r in sorted(fr, key=lambda r: (r["n"], r["variant"])):
             lines.append("| %d | %s | %.4f | %s | %s | %s | %s | %s |" % (
                 r["n"], r["variant"], r["cost_usd"] or 0, r["wall_s"], r["input"], r["cache_read"], r["output"],

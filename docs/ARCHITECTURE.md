@@ -97,7 +97,7 @@ The sweep ran on a Pro plan, with the 5-hour usage meter going from 38% to 52%. 
 
 What the results show:
 - **No break-even in the tested range.** Inline cost grows slowly with N because the work stays in one cached context. Split cost grows with the number of subagents, since each pays its own overhead and cache writes.
-- **Scoping tools cuts the split cost by about 60%** (email: $0.273 → $0.109 and $0.446 → $0.177) but does not close the gap.
+- **Scoping tools cut the split cost by about 60%** (email: $0.273 → $0.109 and $0.446 → $0.177) but did not close the gap. This figure overstates the effect of scoping the *subagents*: in that sweep the scoped variant's parent was also limited to three tools while the unscoped parent loaded all of them. The harness now gives every variant the same full-toolset parent; re-run the eval to measure subagent scoping on its own.
 - **Split was slower too.** It was slower at every size, and much slower on the job board, because verifiers start only after the scouts finish.
 - **Quality is the same.** Final scores differed by 6–8 points on average between the variants, with the same keep/screen/exclude decisions.
 
